@@ -5,6 +5,7 @@ library(plotly)
 library(data.table)
 library(factoextra)
 library(pls)
+library(beeswarm)
 
 MLTPfiles <- list.files(path = "C:/Users/jays/Desktop/Tagpro/MLTP_Stats/",
                         pattern = "*.tsv", full.names = TRUE)
@@ -79,3 +80,24 @@ ppm_tpm_d <- MLTP_defense_stats %>%
 
 ppm_tpm_d
 
+beeswarm(ppm ~ season, data = MLTP_defense_stats, pch = 16, col = rainbow(10), method = "hex",
+         main = "Prevent Per Minute by MLTP Season", xlab = "Season", ylab = "Prevent Per Minute")
+
+beeswarm(tpm ~ season, data = MLTP_defense_stats, pch = 16, col = rainbow(10), method = "hex",
+         main = "Tags Per Minute by MLTP Season", xlab = "Season", ylab = "Tags Per Minute")
+
+
+beeswarm(hpm ~ season, data = MLTP_offense_stats, pch = 16, col = rainbow(10), method = "hex",
+         main = "Hold Per Minute by MLTP Season", xlab = "Season", ylab = "Hold Per Minute")
+
+beeswarm(cpm ~ season, data = MLTP_defense_stats, pch = 16, col = rainbow(10), method = "hex",
+         main = "Caps Per Minute by MLTP Season", xlab = "Season", ylab = "Captures Per Minute")
+
+
+#big_pile <- ggplot(MLTP_filtered_stats, aes(x = ppm, y = success_rate, color = season)) + geom_point() + theme(
+#  text = element_text(family = "Bookman"),
+#  title = element_text(color = "gray25"),
+#  plot.caption = element_text(color = "gray30"),
+#  plot.subtitle = element_text(size = 12)
+#) + facet_wrap(~position) + theme(
+#  plot.background = element_rect(fill = "gray95"))
