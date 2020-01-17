@@ -1,7 +1,7 @@
 ---
-title: "<center>MLTP Through the Ages</center>"
+title: "<center>MLTP Data Visualization Through the Ages</center>"
 author: "<center>Jay Shapiro</center>"
-date: "<center>1/16/2020</center>"
+date: "<center>TBD</center>"
 output: 
   html_document:
     theme: cerulean
@@ -16,9 +16,21 @@ knitr::opts_chunk$set(echo = TRUE)
 
 <br><br>
 
-It's pretty obvious what this is. Just look at the pretty pictures and enjoy the serotonin.
+MLTP is the premiere level of competitive Tagpro in North America. Tagpro is a capture the flag game played between two teams of four players; each team typically has two offenders and two defenders in the competitive meta. This data visualization project will showcase some of the primary metrics used to evaluate players and how the stats have changed across modern competitive seasons.
+
+The main statistics used to judge the individual performance of an offender are captures, grabs, scoring percentage, and hold. Captures is the number of times an offender scored, grabs is the number of times an offender picked up the flag, scoring percentage is simply (captures/grabs)*100, the percentage of grabs that result in a capture, and hold is the duration of time an offender has the flag in their possession. 
+
+Defenders are mainly judged individually on prevent, tags, and kill/death ratio. Prevent is the duration of time the defender protected the flag from being grabbed, tags are the number of times a player kills a player on the other team, and kill/death ratio is (unsurprisingly) the number of tags divided by the number of deaths.
+
+Finally, team success is typically measured in either win/loss/tie record or by score differential. I will use score differential for the purposes of this report, as a quantitative measure of success is more useful here than a qualitative one. 
 
 <br><br>
+
+##  Results
+
+<br><br>
+
+First, we examine several scatterplots.
 
 ```{r echo = FALSE, warning = FALSE, message = FALSE}
 library(tidyverse)
@@ -43,9 +55,10 @@ for (lambda in c(1:10)) {
   MLTP_master_stats <- rbind(MLTP_master_stats, temp)
 }
 
-str(MLTP_master_stats)
+#str(MLTP_master_stats)
 
-MLTP_normalized_stats<- mutate(MLTP_master_stats, scpm = score/minutes, success_rate = pm/minutes, tpm = tags/minutes, poppm = pops/minutes, droppm = drops/minutes, gpm = grabs/minutes,
+MLTP_normalized_stats<- mutate(MLTP_master_stats, scpm = score/minutes, success_rate = pm/minutes, tpm = tags/minutes, 
+                               poppm = pops/minutes, droppm = drops/minutes, gpm = grabs/minutes,
                                hpm = hold/minutes, cpm = captures/minutes, ppm = prevent/minutes, rpm = returns/minutes,
                                pupm = pups/minutes, kdr = tags/pops, limp = flaccids/minutes, LHpm = longholds/minutes, 
                                handpm = handoff/minutes, GHpm = goodhandoff/minutes, gorepm = goregrab/minutes, corepm = coregrab/minutes,
@@ -83,7 +96,13 @@ ppm_tpm_all <- MLTP_filtered_stats %>%
     animation_opts(frame = 1500, easing = NULL, redraw = FALSE)
 
 ppm_tpm_all
+```
 
+<br><br>
+
+
+
+```{r echo = FALSE, warning = FALSE, message = FALSE}
 ppm_tpm_d <- MLTP_defense_stats %>%
   plot_ly(
     x = ~ppm, 
@@ -102,16 +121,61 @@ ppm_tpm_d <- MLTP_defense_stats %>%
   animation_opts(frame = 1500, easing = NULL, redraw = FALSE)
 
 ppm_tpm_d
+```
 
+<br><br>
+
+```{r echo = FALSE, warning = FALSE, message = FALSE}
+hpm_cpm_all <- MLTP_filtered_stats %>%
+  plot_ly(
+    x = ~hpm, 
+    y = ~cpm, 
+    size = ~success_rate, 
+    color = ~position, 
+    frame = ~season, 
+    text = ~player, 
+    hovertemplate = paste("<b>%{text}</b><br><br>",
+                    "%{yaxis.title.text}: %{y}<br>",
+                    "%{xaxis.title.text}: %{x}<br>",
+                    "<extra></extra>"),
+    type = 'scatter',
+    mode = 'markers'
+  ) %>%
+  animation_opts(frame = 1500, easing = NULL, redraw = FALSE)
+
+hpm_cpm_all
+```
+
+<br><br>
+
+```{r echo = FALSE, warning = FALSE, message = FALSE}
+hpm_cpm_o <- MLTP_offense_stats %>%
+  plot_ly(
+    x = ~hpm, 
+    y = ~cpm, 
+    size = ~success_rate, 
+    color = ~position, 
+    frame = ~season, 
+    text = ~player, 
+    hovertemplate = paste("<b>%{text}</b><br><br>",
+                    "%{yaxis.title.text}: %{y}<br>",
+                    "%{xaxis.title.text}: %{x}<br>",
+                    "<extra></extra>"),
+    type = 'scatter',
+    mode = 'markers'
+  ) %>%
+  animation_opts(frame = 1500, easing = NULL, redraw = FALSE)
+
+hpm_cpm_o
+```
+
+<br><br>
+
+```{r echo = FALSE, warning = FALSE, message = FALSE}
 #Prevent by defenders
-boxplot(ppm ~ season, data = MLTP_defense_stats, main = "Prevent Per Minute by MLTP Defenders", 
-        xlab = "Season", ylab = "Prevent Per Minute", col = "gray69", outline = FALSE,
-        par(bg = 'seashell'))
-
-#Release the bees!
 beeswarm(ppm ~ season, data = MLTP_defense_stats, pch = 16, col = rainbow(10), method = "hex",
          main = "Prevent Per Minute by MLTP Season", xlab = "Season", ylab = "Prevent Per Minute",
-         add = TRUE)
+         )
 
 #Plotly inbound
 prevent <- plot_ly(data= MLTP_defense_stats, x = ~season, y = ~ppm, color = ~season, type = "box", boxpoints = 'all',
@@ -119,18 +183,16 @@ prevent <- plot_ly(data= MLTP_defense_stats, x = ~season, y = ~ppm, color = ~sea
   layout(scene = list(xaxis = list(title = 'Season'),
                       yaxis = list(title = 'Prevent Per Minute')),
          title = "Prevent Per Minute by MLTP Defenders")
-
 prevent
+```
 
+<br><br>
 
+```{r echo = FALSE, warning = FALSE, message = FALSE}
 #Tags by defenders
-boxplot(tpm ~ season, data = MLTP_defense_stats, main = "Tags Per Minute by MLTP Defenders", 
-        xlab = "Season", ylab = "Tags Per Minute", col = "gray69", outline = FALSE,
-        par(bg = 'seashell'))
-
 beeswarm(tpm ~ season, data = MLTP_defense_stats, pch = 16, col = rainbow(10), method = "hex",
          main = "Tags Per Minute by MLTP Season", xlab = "Season", ylab = "Tags Per Minute",
-         add = TRUE)
+         )
 
 #Plotly inbound
 tags <- plot_ly(data= MLTP_defense_stats, x = ~season, y = ~tpm, color = ~season, type = "box", boxpoints = 'all',
@@ -138,17 +200,16 @@ tags <- plot_ly(data= MLTP_defense_stats, x = ~season, y = ~tpm, color = ~season
   layout(scene = list(xaxis = list(title = 'Season'),
                       yaxis = list(title = 'Tags Per Minute')),
          title = "Tags Per Minute by MLTP Defenders")
-
 tags
+```
 
+<br><br>
+
+```{r echo = FALSE, warning = FALSE, message = FALSE}
 #KDR by defenders
-boxplot(kdr ~ season, data = MLTP_defense_stats, main = "Kill/Death Ratio by MLTP Defenders", 
-        xlab = "Season", ylab = "Kill/Death Ratio", col = "gray69", outline = FALSE,
-        par(bg = 'seashell'))
-
 beeswarm(kdr ~ season, data = MLTP_defense_stats, pch = 16, col = rainbow(10), method = "hex",
          main = "Kill/Death Ratio by MLTP Season", xlab = "Season", ylab = "Kill/Death Ratio",
-         add = TRUE)
+         )
 
 #Plotly inbound
 kdr <- plot_ly(data= MLTP_defense_stats, x = ~season, y = ~kdr, color = ~season, type = "box", boxpoints = 'all',
@@ -156,18 +217,17 @@ kdr <- plot_ly(data= MLTP_defense_stats, x = ~season, y = ~kdr, color = ~season,
   layout(scene = list(xaxis = list(title = 'Season'),
                       yaxis = list(title = 'Kill/Death Ratio')),
          title = "Kill/Death Ratio by MLTP Defenders")
-
 kdr
+```
 
+<br><br>
 
+```{r echo = FALSE, warning = FALSE, message = FALSE}
 #Hold by attackers
-boxplot(hpm ~ season, data = MLTP_offense_stats, main = "Hold Per Minute by MLTP Offenders", 
-        xlab = "Season", ylab = "Hold Per Minute", col = "gray69", outline = FALSE,
-        par(bg = 'seashell'))
 
 beeswarm(hpm ~ season, data = MLTP_offense_stats, pch = 16, col = rainbow(10), method = "hex",
          main = "Hold Per Minute by MLTP Season", xlab = "Season", ylab = "Hold Per Minute",
-         add = TRUE)
+         )
 
 #Plotly inbound
 hold <- plot_ly(data= MLTP_offense_stats, x = ~season, y = ~hpm, color = ~season, type = "box", boxpoints = 'all',
@@ -175,42 +235,38 @@ hold <- plot_ly(data= MLTP_offense_stats, x = ~season, y = ~hpm, color = ~season
   layout(scene = list(xaxis = list(title = 'Season'),
                       yaxis = list(title = 'Hold Per Minute')),
          title = "Hold Per Minute by MLTP Offenders")
-
 hold
+```
 
+<br><br>
 
+```{r echo = FALSE, warning = FALSE, message = FALSE}
 #Caps for attackers
-boxplot(cpm ~ season, data = MLTP_offense_stats, main = "Captures Per Minute by MLTP Offenders", 
-        xlab = "Season", ylab = "Captures Per Minute", col = "gray69", outline = FALSE,
-        par(bg = 'seashell'))
-
 beeswarm(cpm ~ season, data = MLTP_offense_stats, pch = 16, col = rainbow(10), method = "hex",
          main = "Caps Per Minute by MLTP Season", xlab = "Season", ylab = "Captures Per Minute",
-         add = TRUE)
+         )
 
 caps <- plot_ly(data= MLTP_offense_stats, x = ~season, y = ~cpm, color = ~season, type = "box", boxpoints = 'all',
                 text = ~player) %>%
   layout(scene = list(xaxis = list(title = 'Season'),
                       yaxis = list(title = 'Captures Per Minute')),
          title = "Captures Per Minute by MLTP Offenders")
-
 caps
+```
 
+<br><br>
+
+```{r echo = FALSE, warning = FALSE, message = FALSE}
 #Grabs for attackers
-boxplot(gpm ~ season, data = MLTP_offense_stats, main = "Grabs Per Minute by MLTP Offenders", 
-        xlab = "Season", ylab = "Grabs Per Minute", col = "gray69", outline = FALSE,
-        par(bg = 'seashell'))
-
 beeswarm(gpm ~ season, data = MLTP_offense_stats, pch = 16, col = rainbow(10), method = "hex",
          main = "Grabs Per Minute by MLTP Season", xlab = "Season", ylab = "Grabs Per Minute",
-         add = TRUE)
+         )
 
 grabs <- plot_ly(data= MLTP_offense_stats, x = ~season, y = ~gpm, color = ~season, type = "box", boxpoints = 'all',
                 text = ~player) %>%
   layout(scene = list(xaxis = list(title = 'Season'),
                       yaxis = list(title = 'Grabs Per Minute')),
          title = "Grabs Per Minute by MLTP Offenders")
-
 grabs
 ```
 
