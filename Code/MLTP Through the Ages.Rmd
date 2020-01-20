@@ -22,7 +22,7 @@ The main statistics used to judge the individual performance of an offender are 
 
 Defenders are mainly judged individually on prevent, tags, and kill/death ratio. Prevent is the duration of time the defender protected the flag from being grabbed, tags are the number of times a player kills a player on the other team, and kill/death ratio is (unsurprisingly) the number of tags divided by the number of deaths.
 
-Finally, team success is typically measured in either win/loss/tie record or by score differential. I will use score differential for the purposes of this report, as a quantitative measure of success is more useful here than a qualitative one. 
+Finally, team success is typically measured in either win/loss/tie record or by score differential. I will use score differential for the purposes of this report, as a quantitative measure of success is more useful in this case than a qualitative one, as winning by one capture is a much smaller indicator of success than winning by ten captures. 
 
 <br><br>
 
@@ -30,7 +30,11 @@ Finally, team success is typically measured in either win/loss/tie record or by 
 
 <br><br>
 
-First, we examine several scatterplots.
+First, we consider a handful of scatterplots comparing some of the defensive metrics to each other. In each plot, the size of the data point depicts the score differential per minute for that observation. 
+
+First, we compare tags per minute to prevent per minute, colored by the main position of the player in each observation. Comparing the two groups, defenders and offenders, gives a schema for what 
+
+<br><br>
 
 ```{r echo = FALSE, warning = FALSE, message = FALSE}
 library(tidyverse)
@@ -100,7 +104,7 @@ ppm_tpm_all
 
 <br><br>
 
-
+Next, we remove the offenders from the mix to only see the plot for the defenders. By reducing the domain and and range of the axes, we have an even better picture of the spread of the players for which the stats are actually important for. 
 
 ```{r echo = FALSE, warning = FALSE, message = FALSE}
 ppm_tpm_d <- MLTP_defense_stats %>%
