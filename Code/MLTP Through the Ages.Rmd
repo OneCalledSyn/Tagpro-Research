@@ -1,5 +1,5 @@
 ---
-title: "<center>MLTP Data Visualization Through the Ages</center>"
+title: "<center>MLTP: Data Visualization Through the Ages</center>"
 author: "<center>Jay Shapiro</center>"
 date: "<center>TBD</center>"
 output: 
@@ -22,17 +22,21 @@ The main statistics used to judge the individual performance of an offender are 
 
 Defenders are mainly judged individually on prevent, tags, and kill/death ratio. Prevent is the duration of time the defender protected the flag from being grabbed, tags are the number of times a player kills a player on the other team, and kill/death ratio is (unsurprisingly) the number of tags divided by the number of deaths.
 
-Finally, team success is typically measured in either win/loss/tie record or by score differential. I will use score differential for the purposes of this report, as a quantitative measure of success is more useful in this case than a qualitative one, as winning by one capture is a much smaller indicator of success than winning by ten captures. 
+Finally, team success is typically measured in either win/loss/tie record or by score differential. I will use score differential for the purposes of this data visualization, as a quantitative measure of success is more useful in this case than a qualitative one, as winning by one capture is a much smaller indicator of success than winning by ten captures. 
 
 <br><br>
 
-##  Results
+##  Exploration
 
 <br><br>
 
-First, we consider a handful of scatterplots comparing some of the defensive metrics to each other. In each plot, the size of the data point depicts the score differential per minute for that observation. 
+### Part I: Defense Scatterplots
 
-First, we compare tags per minute to prevent per minute, colored by the main position of the player in each observation. Comparing the two groups, defenders and offenders, gives a schema for what 
+<br><br>
+
+First, we consider a handful of interactive scatterplots comparing some of the defensive metrics to each other. In each plot, the size of the data point depicts the score differential per minute for that observation. Hovering over each observation will provide the player's name and their x and y axis values. Each plot also has a slider that controls which season is displayed on the graph; hitting 'Play" will have the plot cycle autonomously through the seasons for a full rotation, and each season can also be directly clicked on manually to jump around. 
+
+First, we compare tags per minute to prevent per minute, colored by the main position of the player in each observation. Comparing the two groups, defenders and offenders, gives a schema for what kind of stats a player should be getting for their position: 
 
 <br><br>
 
@@ -97,14 +101,19 @@ ppm_tpm_all <- MLTP_filtered_stats %>%
     type = 'scatter',
     mode = 'markers'
   ) %>%
-    animation_opts(frame = 1500, easing = NULL, redraw = FALSE)
+    animation_opts(frame = 1500, easing = NULL, redraw = FALSE) %>%
+      layout(scene = list(xaxis = list(title = 'Prevent Per Minute'),
+                          yaxis = list(title = 'Tags Per Minute')),
+                          title = "PPM vs TPM for Both Positions")
 
 ppm_tpm_all
 ```
 
 <br><br>
 
-Next, we remove the offenders from the mix to only see the plot for the defenders. By reducing the domain and and range of the axes, we have an even better picture of the spread of the players for which the stats are actually important for. 
+Next, we remove the offenders from the mix to only see the plot for the defenders. Although seeing the positional differences was useful, reducing the domain and and range of the axes provides a better picture of the subset of players for which the stats are actually important:
+
+<br><br>
 
 ```{r echo = FALSE, warning = FALSE, message = FALSE}
 ppm_tpm_d <- MLTP_defense_stats %>%
@@ -122,18 +131,29 @@ ppm_tpm_d <- MLTP_defense_stats %>%
     type = 'scatter',
     mode = 'markers'
   ) %>%
-  animation_opts(frame = 1500, easing = NULL, redraw = FALSE)
+  animation_opts(frame = 1500, easing = NULL, redraw = FALSE) %>%
+    layout(scene = list(xaxis = list(title = 'Prevent Per Minute'),
+                        yaxis = list(title = 'Tags Per Minute')),
+                        title = "PPM vs TPM for Defenders")
 
 ppm_tpm_d
 ```
 
 <br><br>
 
+### Part II: Offense Scatterplots
+
+<br><br>
+
+Now we employ the same technique for hold per minute compared to grabs per minute, again presenting both positions separated by color, and then a subset including only the offenders:
+
+<br><br>
+
 ```{r echo = FALSE, warning = FALSE, message = FALSE}
-hpm_cpm_all <- MLTP_filtered_stats %>%
+hpm_gpm_all <- MLTP_filtered_stats %>%
   plot_ly(
-    x = ~hpm, 
-    y = ~cpm, 
+    x = ~gpm, 
+    y = ~hpm, 
     size = ~success_rate, 
     color = ~position, 
     frame = ~season, 
@@ -145,18 +165,21 @@ hpm_cpm_all <- MLTP_filtered_stats %>%
     type = 'scatter',
     mode = 'markers'
   ) %>%
-  animation_opts(frame = 1500, easing = NULL, redraw = FALSE)
+  animation_opts(frame = 1500, easing = NULL, redraw = FALSE) %>%
+    layout(scene = list(xaxis = list(title = 'Grabs Per Minute'),
+                        yaxis = list(title = 'Hold Per Minute')),
+                        title = "GPM vs HPM for Both Positions")
 
-hpm_cpm_all
+hpm_gpm_all
 ```
 
 <br><br>
 
 ```{r echo = FALSE, warning = FALSE, message = FALSE}
-hpm_cpm_o <- MLTP_offense_stats %>%
+hpm_gpm_o <- MLTP_offense_stats %>%
   plot_ly(
-    x = ~hpm, 
-    y = ~cpm, 
+    x = ~gpm, 
+    y = ~hpm, 
     size = ~success_rate, 
     color = ~position, 
     frame = ~season, 
@@ -168,17 +191,34 @@ hpm_cpm_o <- MLTP_offense_stats %>%
     type = 'scatter',
     mode = 'markers'
   ) %>%
-  animation_opts(frame = 1500, easing = NULL, redraw = FALSE)
+  animation_opts(frame = 1500, easing = NULL, redraw = FALSE) %>%
+    layout(scene = list(xaxis = list(title = 'Grabs Per Minute'),
+                        yaxis = list(title = 'Hold Per Minute')),
+                        title = "GPM vs HPM for Offenders")
 
-hpm_cpm_o
+hpm_gpm_o
 ```
+
+<br><br>
+
+### Part III: Distribution Visualization
+
+<br><br>
+
+Beeswarm plots are a magnificent way to visualize distributions of MLTP stats. Beeswarms show the individual observations as unique data points, unlike other distribution visualization techniques which often encode the data abstractly. For example, boxplots uses a box and whiskers to encapsulate all of the non-outlier observations and rely on quartiles and summary statistics. Histograms employ binning to group the data points into bars to display, again obscuring the individual observations. One of the main limitations of beeswarm plots is that for increasingly large datasets, it becomes more and more difficult to show each observation. Modern MLTP seasons typically have somewhere between 32 and 64 majors starters, depending on the number of teams. which falls into the optimal number of observations for a beeswarm plot.
+
+To supplement each beeswarm plot, I have also included an interactive boxplot (a.k.a box-and-whiskers plot) with the individual data points slightly offset from the main body of the boxplot. Hovering over the box for each season will display the summary statistics for that box: Minimum, maximum, first quartile, third quartile, median, and upper fence. Hovering over each data point will give the player's name, the season the observation was from, and the value from the y-axis, which varies per plot. Toggling the colored boxes in the legend allows the box for each season to be removed or returned to the plot, and double-clicking on any of the boxes will display that season in isolation and remove all other seasons from the boxplot.
+
+<br><br>
+
+#### Section A: Prevent
 
 <br><br>
 
 ```{r echo = FALSE, warning = FALSE, message = FALSE}
 #Prevent by defenders
 beeswarm(ppm ~ season, data = MLTP_defense_stats, pch = 16, col = rainbow(10), method = "hex",
-         main = "Prevent Per Minute by MLTP Season", xlab = "Season", ylab = "Prevent Per Minute",
+         main = "Prevent Per Minute for Defenders ", xlab = "Season", ylab = "Prevent Per Minute",
          )
 
 #Plotly inbound
@@ -186,16 +226,20 @@ prevent <- plot_ly(data= MLTP_defense_stats, x = ~season, y = ~ppm, color = ~sea
              text = ~player) %>%
   layout(scene = list(xaxis = list(title = 'Season'),
                       yaxis = list(title = 'Prevent Per Minute')),
-         title = "Prevent Per Minute by MLTP Defenders")
+         title = "Prevent Per Minute for Defenders")
 prevent
 ```
+
+<br><br>
+
+#### Section B: Tags
 
 <br><br>
 
 ```{r echo = FALSE, warning = FALSE, message = FALSE}
 #Tags by defenders
 beeswarm(tpm ~ season, data = MLTP_defense_stats, pch = 16, col = rainbow(10), method = "hex",
-         main = "Tags Per Minute by MLTP Season", xlab = "Season", ylab = "Tags Per Minute",
+         main = "Tags Per Minute for Defenders", xlab = "Season", ylab = "Tags Per Minute",
          )
 
 #Plotly inbound
@@ -203,7 +247,7 @@ tags <- plot_ly(data= MLTP_defense_stats, x = ~season, y = ~tpm, color = ~season
              text = ~player) %>%
   layout(scene = list(xaxis = list(title = 'Season'),
                       yaxis = list(title = 'Tags Per Minute')),
-         title = "Tags Per Minute by MLTP Defenders")
+         title = "Tags Per Minute for Defenders")
 tags
 ```
 
