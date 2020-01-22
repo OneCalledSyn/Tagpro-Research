@@ -34,7 +34,7 @@ Finally, team success is typically measured in either win/loss/tie record or by 
 
 <br><br>
 
-First, we consider a handful of interactive scatterplots comparing some of the defensive metrics to each other. In each plot, the size of the data point depicts the score differential per minute for that observation. Hovering over each observation will provide the player's name and their x and y axis values. Each plot also has a slider that controls which season is displayed on the graph; hitting 'Play" will have the plot cycle autonomously through the seasons for a full rotation, and each season can also be directly clicked on manually to jump around. 
+First, we consider a handful of interactive scatterplots comparing some of the defensive metrics to each other. In each plot, the size of the data point depicts the score differential per minute for that observation. Hovering over each observation will provide the player's name and the abscissa and ordinate values. Each plot also has a slider that controls which MLTP season is displayed on the graph; hitting 'Play" will have the plot cycle autonomously through the seasons for a full rotation, and manually clicking on a season in the slider will shift the plot directly to that season. 
 
 First, we compare tags per minute to prevent per minute, colored by the main position of the player in each observation. Comparing the two groups, defenders and offenders, gives a schema for what kind of stats a player should be getting for their position: 
 
@@ -253,10 +253,14 @@ tags
 
 <br><br>
 
+#### Section C: Kill/Death Ratio
+
+<br><br>
+
 ```{r echo = FALSE, warning = FALSE, message = FALSE}
 #KDR by defenders
 beeswarm(kdr ~ season, data = MLTP_defense_stats, pch = 16, col = rainbow(10), method = "hex",
-         main = "Kill/Death Ratio by MLTP Season", xlab = "Season", ylab = "Kill/Death Ratio",
+         main = "Kill/Death Ratio for Defenders", xlab = "Season", ylab = "Kill/Death Ratio",
          )
 
 #Plotly inbound
@@ -264,9 +268,13 @@ kdr <- plot_ly(data= MLTP_defense_stats, x = ~season, y = ~kdr, color = ~season,
                 text = ~player) %>%
   layout(scene = list(xaxis = list(title = 'Season'),
                       yaxis = list(title = 'Kill/Death Ratio')),
-         title = "Kill/Death Ratio by MLTP Defenders")
+         title = "Kill/Death Ratio for Defenders")
 kdr
 ```
+
+<br><br>
+
+#### Section D: Hold
 
 <br><br>
 
@@ -274,7 +282,7 @@ kdr
 #Hold by attackers
 
 beeswarm(hpm ~ season, data = MLTP_offense_stats, pch = 16, col = rainbow(10), method = "hex",
-         main = "Hold Per Minute by MLTP Season", xlab = "Season", ylab = "Hold Per Minute",
+         main = "Hold Per Minute for Offenders", xlab = "Season", ylab = "Hold Per Minute",
          )
 
 #Plotly inbound
@@ -282,16 +290,20 @@ hold <- plot_ly(data= MLTP_offense_stats, x = ~season, y = ~hpm, color = ~season
              text = ~player) %>%
   layout(scene = list(xaxis = list(title = 'Season'),
                       yaxis = list(title = 'Hold Per Minute')),
-         title = "Hold Per Minute by MLTP Offenders")
+         title = "Hold Per Minute for Offenders")
 hold
 ```
+
+<br><br>
+
+#### Section E: Captures
 
 <br><br>
 
 ```{r echo = FALSE, warning = FALSE, message = FALSE}
 #Caps for attackers
 beeswarm(cpm ~ season, data = MLTP_offense_stats, pch = 16, col = rainbow(10), method = "hex",
-         main = "Caps Per Minute by MLTP Season", xlab = "Season", ylab = "Captures Per Minute",
+         main = "Caps Per Minute for Offenders", xlab = "Season", ylab = "Captures Per Minute",
          )
 
 caps <- plot_ly(data= MLTP_offense_stats, x = ~season, y = ~cpm, color = ~season, type = "box", boxpoints = 'all',
@@ -304,10 +316,14 @@ caps
 
 <br><br>
 
+#### Section F: Grabs
+
+<br><br>
+
 ```{r echo = FALSE, warning = FALSE, message = FALSE}
 #Grabs for attackers
 beeswarm(gpm ~ season, data = MLTP_offense_stats, pch = 16, col = rainbow(10), method = "hex",
-         main = "Grabs Per Minute by MLTP Season", xlab = "Season", ylab = "Grabs Per Minute",
+         main = "Grabs Per Minute for All Players", xlab = "Season", ylab = "Grabs Per Minute",
          )
 
 grabs <- plot_ly(data= MLTP_offense_stats, x = ~season, y = ~gpm, color = ~season, type = "box", boxpoints = 'all',
@@ -317,6 +333,99 @@ grabs <- plot_ly(data= MLTP_offense_stats, x = ~season, y = ~gpm, color = ~seaso
          title = "Grabs Per Minute by MLTP Offenders")
 grabs
 ```
+
+<br><br>
+
+#### Section G: Capture Differential
+
+<br><br>
+
+```{r echo = FALSE, warning = FALSE, message = FALSE}
+beeswarm(success_rate ~ season, data = MLTP_filtered_stats, pch = 16, col = rainbow(10), method = "hex",
+         main = "Capture Differential Per Minute for All Players", xlab = "Season", ylab = "Grabs Per Minute",
+         )
+
+cap_diff <- plot_ly(data= MLTP_filtered_stats, x = ~season, y = ~success_rate, color = ~season, type = "box", boxpoints = 'all',
+                text = ~player) %>%
+  layout(scene = list(xaxis = list(title = 'Season'),
+                      yaxis = list(title = 'Capture Differential Per Minute')),
+         title = "Capture Differential Per Minute for All Players")
+cap_diff
+```
+
+<br><br>
+
+### Part IV: Miscellaneous Lesser Categories
+
+<br><br>
+
+I have created beeswarms and boxplots for some of the stat categories that are rarely talked about in competitive play, but may still be of interest. Unlike the previous sections, I will merely display the distributions and eschew any explanations.
+
+<br><br>
+
+```{r echo = FALSE, warning = FALSE, message = FALSE}
+beeswarm(scpm ~ season, data = MLTP_filtered_stats, pch = 16, col = rainbow(10), method = "hex",
+         main = "Score Per Minute for All Players", xlab = "Season", ylab = "Score Per Minute",
+         )
+
+score <- plot_ly(data= MLTP_filtered_stats, x = ~season, y = ~scpm, color = ~season, type = "box", boxpoints = 'all',
+                text = ~player) %>%
+  layout(scene = list(xaxis = list(title = 'Season'),
+                      yaxis = list(title = 'Score Per Minute')),
+         title = "Score Per Minute for All Players")
+score
+```
+
+<br><br>
+
+```{r echo = FALSE, warning = FALSE, message = FALSE}
+beeswarm(pupm ~ season, data = MLTP_filtered_stats, pch = 16, col = rainbow(10), method = "hex",
+         main = "Powerups Per Minute for All Players", xlab = "Season", ylab = "Powerups Per Minute",
+         )
+
+powerups <- plot_ly(data= MLTP_filtered_stats, x = ~season, y = ~pupm, color = ~season, type = "box", boxpoints = 'all',
+                text = ~player) %>%
+  layout(scene = list(xaxis = list(title = 'Season'),
+                      yaxis = list(title = 'Powerups Per Minute')),
+         title = "Powerups Per Minute for All Players")
+powerups
+```
+
+<br><br>
+
+```{r echo = FALSE, warning = FALSE, message = FALSE}
+beeswarm(poppm ~ season, data = MLTP_defense_stats, pch = 16, col = rainbow(10), method = "hex",
+         main = "Pops Per Minute for Defenders", xlab = "Season", ylab = "Pops Per Minute",
+         )
+
+dpops <- plot_ly(data= MLTP_defense_stats, x = ~season, y = ~poppm, color = ~season, type = "box", boxpoints = 'all',
+                text = ~player) %>%
+  layout(scene = list(xaxis = list(title = 'Season'),
+                      yaxis = list(title = 'Pops Per Minute')),
+         title = "Pops Per Minute for Defenders")
+dpops
+```
+
+<br><br>
+
+```{r echo = FALSE, warning = FALSE, message = FALSE}
+beeswarm(droppm ~ season, data = MLTP_offense_stats, pch = 16, col = rainbow(10), method = "hex",
+         main = "Drops Per Minute for Offenders", xlab = "Season", ylab = "Drops Per Minute",
+         )
+
+odrops <- plot_ly(data= MLTP_offense_stats, x = ~season, y = ~droppm, color = ~season, type = "box", boxpoints = 'all',
+                text = ~player) %>%
+  layout(scene = list(xaxis = list(title = 'Season'),
+                      yaxis = list(title = 'Drops Per Minute')),
+         title = "Drops Per Minute for Offenders")
+odrops
+```
+
+<br><br>
+
+## IDE Information
+
+<br><br>
 
 ```{r echo = FALSE}
 sessionInfo()
