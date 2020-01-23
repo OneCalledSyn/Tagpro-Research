@@ -16,13 +16,27 @@ knitr::opts_chunk$set(echo = TRUE)
 
 <br><br>
 
-MLTP is the premiere level of competitive Tagpro in North America. Tagpro is a capture the flag game played between two teams of four players; each team typically has two offenders and two defenders in the competitive meta. This data visualization project will showcase some of the primary metrics used to evaluate players and how the stats have changed across modern competitive seasons.
+### What is MLTP?
 
-The main statistics used to judge the individual performance of an offender are captures, grabs, scoring percentage, and hold. Captures is the number of times an offender scored, grabs is the number of times an offender picked up the flag, scoring percentage is simply (captures/grabs)*100, the percentage of grabs that result in a capture, and hold is the duration of time an offender has the flag in their possession. 
+<br><br>
 
-Defenders are mainly judged individually on prevent, tags, and kill/death ratio. Prevent is the duration of time the defender protected the flag from being grabbed, tags are the number of times a player kills a player on the other team, and kill/death ratio is (unsurprisingly) the number of tags divided by the number of deaths.
+To answer the above question, first we must answer the question "What is Tagpro?" Tagpro is an online, capture the flag (CTF) game generally played between two teams of four players on a variety of tile-based maps.  Each player is represented by a two-dimensional, paint-filled ball that rolls around the map using only cardinal direction keypresses (up/down/left/right) as input. In the competitive meta, teams typically consist of two primary offenders and two primary defenders. The main objective of the game for a team is to grab the other team's flag and bring it safely back to their own flag without getting tagged, with the imposition that teams can only score when their own flag is also safe in base. Offenders thus focus their efforts on grabbing the other team's flag, holding the flag and staying alive until an opportunity arises, and then pushing into their own base to attempt to get a capture. Other duties include helping their defense tag or contain the opposing flag carrier, fighting for powerups, blocking enemies to assist their teammates, and getting 'regrab'. Regrab refers to the strategy of having one offender wait in the opponent's base when their partner already has the opponent's flag, so that if the offensive partner is popped, the other offender will instantly grab the flag when it teleports back to the opponent's base. 
 
-Finally, team success is typically measured in either win/loss/tie record or by score differential. I will use score differential for the purposes of this data visualization, as a quantitative measure of success is more useful in this case than a qualitative one, as winning by one capture is a much smaller indicator of success than winning by ten captures. 
+Defenders will focus primarily on keeping their team's flag secure on the flag tile, and if the other team manages to grab, they will be the ones primarily responsible for chasing the flag carrier and tagging him to return the flag; when a flag carrier is tagged, their ball pops and the flag is teleported back to its home tile in base. Other duties for defenders are fighting for powerups, blocking the other team so the flag carrier can come safely into base, and playing 'anti-re'. Anti-re is a strategy developed to counter regrab involveing a player guarding the empty flag tile in their own base. The point of this maneuver is that once the enemy flag carrier dies and the flag teleports back, there is a player to defend the flag from the other team's regrab. 
+
+Now that I've explained what Tagpro itself is, we can revisit the initial question: What is MLTP? MLTP is the premiere level of competitive Tagpro in the North American scene; the acronym stands for 'Major League TagPro'.  This data visualization project will showcase some of the primary metrics used to evaluate MLTP players and how the stats have changed across modern competitive seasons. Season 10 will be considered the first modern season for the purpose of this exploration, since it was the first season that anti-re saw widespread use in the competitive meta. Additionally, Season 10 was the first stats started being automatically captured and then imported to TagproLeague instead of in Excel documents. With the advent of that technology came many more statistics and metrics available that simply couldn't be recorded previously.
+
+<br><br>
+
+### Metrics for Player Evaluation
+
+<br><br>
+
+The main statistics used to holistically judge the individual performance of an offender are captures, grabs, scoring percentage, powerups, and hold. Captures is the number of times an offender scored, grabs is the number of times an offender picked up the flag, scoring percentage is the percentage of grabs that result in a capture: $(\frac{Captures}{Grabs})*100$, powerups is merely the number of powerups a player picked up, and hold is the duration of time an offender has the flag in their possession. 
+
+Defenders are holistically judged on prevent, tags, powerups, and kill/death ratio. Prevent is the duration of time the defender protected the flag from being grabbed, tags are the number of times a player kills a player on the other team, and (unsurprisingly) kill/death ratio is just: $\frac{Tags}{Pops}$, the number of tags divided by the number of pops.
+
+Finally, team success is typically measured using either win/loss/tie record or by capture differential. I will use capture differential for the purposes of this data visualization, as a quantitative measure of success is more useful in this case than a qualitative one, since winning by one capture is a much smaller indicator of success than winning by ten captures. 
 
 <br><br>
 
@@ -71,7 +85,7 @@ MLTP_normalized_stats<- mutate(MLTP_master_stats, scpm = score/minutes, success_
                                pupm = pups/minutes, kdr = tags/pops, limp = flaccids/minutes, LHpm = longholds/minutes, 
                                handpm = handoff/minutes, GHpm = goodhandoff/minutes, gorepm = goregrab/minutes, corepm = coregrab/minutes,
                                copm = cohandoff/minutes, inbasepm = retinbase/minutes, quickpm = quickret/minutes, savepm = saves/minutes,
-                               HApm = holdagainst/minutes)
+                               HApm = holdagainst/minutes, cap_per = (captures/grabs)*100)
 
 MLTP_filtered_stats <- MLTP_normalized_stats %>%
   filter(minutes >= 120) %>%
@@ -205,13 +219,21 @@ hpm_gpm_o
 
 <br><br>
 
-Beeswarm plots are a magnificent way to visualize distributions of MLTP stats. Beeswarms show the individual observations as unique data points, unlike other distribution visualization techniques which often encode the data abstractly. For example, boxplots uses a box and whiskers to encapsulate all of the non-outlier observations and rely on quartiles and summary statistics. Histograms employ binning to group the data points into bars to display, again obscuring the individual observations. One of the main limitations of beeswarm plots is that for increasingly large datasets, it becomes more and more difficult to show each observation. Modern MLTP seasons typically have somewhere between 32 and 64 majors starters, depending on the number of teams. which falls into the optimal number of observations for a beeswarm plot.
+Beeswarm plots are a magnificent way to visualize distributions of MLTP stats. Beeswarms show the individual observations as unique data points, unlike other distribution visualization techniques which often encode the data abstractly. For example, boxplots uses a box and whiskers to encapsulate all of the non-outlier observations and rely on quartiles and summary statistics. Histograms employ binning to group the data points into bars to display, again obscuring the individual observations. One of the main limitations of beeswarm plots is that for increasingly large datasets, it becomes more and more difficult to show each observation. Modern MLTP seasons typically have somewhere between 32 and 64 majors starters, depending on the number of teams. which falls into the optimal range for the number of observations a beeswarm plot contains.
 
-To supplement each beeswarm plot, I have also included an interactive boxplot (a.k.a box-and-whiskers plot) with the individual data points slightly offset from the main body of the boxplot. Hovering over the box for each season will display the summary statistics for that box: Minimum, maximum, first quartile, third quartile, median, and upper fence. Hovering over each data point will give the player's name, the season the observation was from, and the value from the y-axis, which varies per plot. Toggling the colored boxes in the legend allows the box for each season to be removed or returned to the plot, and double-clicking on any of the boxes will display that season in isolation and remove all other seasons from the boxplot.
+To supplement each beeswarm plot, I have also included an interactive boxplot (a.k.a box-and-whiskers plot) with the individual data points slightly offset from the main body of the boxplot. Hovering over the box for each season will display the summary statistics for that box: minimum, maximum, first quartile, third quartile, median, and upper/lower fence if applicable. Hovering over each data point will give the player's name, the season, and the ordinate value. Toggling the colored boxes in the legend allows the box for each season to be removed or returned to the plot, and double-clicking on any of the boxes will display that season in isolation and remove all other seasons from the boxplot. Double-clicking on the box again will revert the plot back to its default display.
 
 <br><br>
 
 #### Section A: Prevent
+
+<br><br>
+
+We can see that defenders were not very adept at keeping the flag in base back in Season 10, with a median prevent per minute (PPM) of only 11.76, the highest was only 16.59 PPM from YoungSinatra, and the lowest was an abysmal 6.02 PPM from Gem. The following season was a little bit cleaner at the bottom end, with a minimum of 9.36 PPM, which raised the median up to 13.33 PPM. However, the maximum of 16.24 PPM from Bal McCartny suggests that the top defenders didn't manage to make any meaningful progress in shutting down offenses in S11 compared to S10. 
+
+Season 12 marked the beginning of the Preventaissance, with the Meme*Team defensive duo of Syniikal and YoungSinatra (xXw3Edl0rdXx) shattering all previous prevent records by staggering margins, with Syniikal having 19.93 PPM and YoungSinatra having 20.19 PPM, the first player in MLTP to ever break the 20+ PPM threshold. No player in any previous season had ever crossed even crossed 17 ppm, yet S12 saw a total of four players do so, with SIDE and EASHY coming in at 17.52 PPM and 17.33 PPM respectively. The median also saw another big jump, from 13.33 PPM up to 14.58 PPM. 
+
+S13 saw defensive prowess continue to fluorish, with the median prevent continuing to climb up to 15.75 PPM. Syniikal finishing with a solid 20.05 PPM placed him as the second player to ever cross the 20+ PPM barrier, and seven other players would join him in the 17+ club that season: C Bivvey, alchemist, BALLDON'TLIE, iAaronK, aardvark, siDe, and Eashy. S14 brought a period of stagnation for most of the league, with the median moving almost imperceptibly up to 15.90 PPM. Syniikal achieved a mind-blowing 25.14 PPM, over 9 PPM greater than the median, becoming the first and almost certainly the only player to ever cross the 25+ PPM threshold.
 
 <br><br>
 
@@ -303,7 +325,7 @@ hold
 ```{r echo = FALSE, warning = FALSE, message = FALSE}
 #Caps for attackers
 beeswarm(cpm ~ season, data = MLTP_offense_stats, pch = 16, col = rainbow(10), method = "hex",
-         main = "Caps Per Minute for Offenders", xlab = "Season", ylab = "Captures Per Minute",
+         main = "Captures Per Minute for Offenders", xlab = "Season", ylab = "Captures Per Minute",
          )
 
 caps <- plot_ly(data= MLTP_offense_stats, x = ~season, y = ~cpm, color = ~season, type = "box", boxpoints = 'all',
@@ -323,26 +345,45 @@ caps
 ```{r echo = FALSE, warning = FALSE, message = FALSE}
 #Grabs for attackers
 beeswarm(gpm ~ season, data = MLTP_offense_stats, pch = 16, col = rainbow(10), method = "hex",
-         main = "Grabs Per Minute for All Players", xlab = "Season", ylab = "Grabs Per Minute",
+         main = "Grabs Per Minute for Offenders", xlab = "Season", ylab = "Grabs Per Minute",
          )
 
 grabs <- plot_ly(data= MLTP_offense_stats, x = ~season, y = ~gpm, color = ~season, type = "box", boxpoints = 'all',
                 text = ~player) %>%
   layout(scene = list(xaxis = list(title = 'Season'),
                       yaxis = list(title = 'Grabs Per Minute')),
-         title = "Grabs Per Minute by MLTP Offenders")
+         title = "Grabs Per Minute for Offenders")
 grabs
 ```
 
 <br><br>
 
-#### Section G: Capture Differential
+#### Section G: Scoring Percentage
+
+<br><br>
+
+```{r echo = FALSE, warning = FALSE, message = FALSE}
+beeswarm(cap_per ~ season, data = MLTP_filtered_stats, pch = 16, col = rainbow(10), method = "hex",
+         main = "Scoring Percentage for All Players", xlab = "Season", ylab = "Scoring Percentage",
+         )
+
+cap_percent <- plot_ly(data= MLTP_filtered_stats, x = ~season, y = ~cap_per, color = ~season, type = "box", boxpoints = 'all',
+                text = ~player) %>%
+  layout(scene = list(xaxis = list(title = 'Season'),
+                      yaxis = list(title = 'Scoring Percentage')),
+         title = "Scoring Percentage for All Players")
+cap_percent
+```
+
+<br><br>
+
+#### Section H: Capture Differential
 
 <br><br>
 
 ```{r echo = FALSE, warning = FALSE, message = FALSE}
 beeswarm(success_rate ~ season, data = MLTP_filtered_stats, pch = 16, col = rainbow(10), method = "hex",
-         main = "Capture Differential Per Minute for All Players", xlab = "Season", ylab = "Grabs Per Minute",
+         main = "Capture Differential Per Minute for All Players", xlab = "Season", ylab = "Capture Differential Per Minute",
          )
 
 cap_diff <- plot_ly(data= MLTP_filtered_stats, x = ~season, y = ~success_rate, color = ~season, type = "box", boxpoints = 'all',
