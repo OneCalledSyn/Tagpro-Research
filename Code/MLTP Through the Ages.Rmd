@@ -235,6 +235,8 @@ Season 12 marked the beginning of the Preventaissance, with the Meme*Team defens
 
 S13 saw defensive prowess continue to fluorish, with the median prevent continuing to climb up to 15.75 PPM. Syniikal finishing with a solid 20.05 PPM placed him as the second player to ever cross the 20+ PPM barrier, and seven other players would join him in the 17+ club that season: C Bivvey, alchemist, BALLDON'TLIE, iAaronK, aardvark, siDe, and Eashy. S14 brought a period of stagnation for most of the league, with the median moving almost imperceptibly up to 15.90 PPM. Syniikal achieved a mind-blowing 25.14 PPM, over 9 PPM greater than the median, becoming the first and almost certainly the only player to ever cross the 25+ PPM threshold.
 
+S15 and S16 both saw miniscule increases in the median PPM, again with Syniikal leading the pack in both seasons. S16 saw HERB become the third member to join the 20+ PPM crew. S10-S16 saw monotonic increases in the median PPM, but a major change in S17 would shake the game to its very core. S17 saw the game's creator, known in-game as 'LuckySpammer', remove every extant Tagpro server and replace them with new ones from a different provider. For many players, the new servers were a direct downgrade and complaints of bad ping and server instability plagued the league like never before. S17 marked the first season in the modern era where the median PPM had fallen from the previous season. This didn't stop BigBird (or Syniikal) however, as BigBird still managed to accrue 20.69 PPM, becoming the 4th player to join the 20+ PPM club, and the only one who managed it without being Syniikal's partner. The median prevent continued to nosedive in S18 all the way down to 14.58 PPM, lower than it had been since S11. S19 saw a very slight recovery in the median prevent, but the distribution looks fairly similar to the S18 distribution. Syniikal, playing as TomatoFarmer, once again topped the prevent leaderboard with his seventh straight season of not only being first in prevent, but having over 20 PPM. Only time will tell if the defenders will be able to shore up their collective in-base acumen or if the offenders have ultimately begun to turn the tide in the North American competitive scene.
+
 <br><br>
 
 ```{r echo = FALSE, warning = FALSE, message = FALSE}
@@ -255,6 +257,10 @@ prevent
 <br><br>
 
 #### Section B: Tags
+
+<br><br>
+
+Back in S10, defenders in general weren't getting many tags, with the median being around 1.44 tags per minute (TPM). 
 
 <br><br>
 
