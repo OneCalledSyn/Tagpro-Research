@@ -260,7 +260,9 @@ prevent
 
 <br><br>
 
-Back in S10, defenders in general weren't getting many tags, with the median being around 1.44 tags per minute (TPM). 
+Back in S10, defenders in general weren't getting many tags, with the median being around a paltry 1.44 tags per minute (TPM). Making up for the meager median were two players who smashed through the 2.0 TPM threshhold, Abe Lincoln with 2.11 TPM and the infamous GriefSeeds with an astounding 2.38 TPM. The disparity between GriefSeeds' mechanical ability versus the rest of the defenders' mechanics from the Classical Era was immense. GriefSeeds received a lifetime ban from MLTP for botting in S7, which was then overturned due to lack of definitive evidence by the start of S8. He then continued to put up dominant mechanical performances that seemed to defy human limitations in S8 and S10, after which he unfortunately retired. To this day, players are still on both sides of the fence on whether or not there was cheating involved, but regardless of which viewpoint they take, most players agree it would be a miracle to see anything like it ever again in MLTP.
+
+S11 through S15 saw a relatively stable median for TPM, with each median falling with the 1.53-1.58 TPM range
 
 <br><br>
 
