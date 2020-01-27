@@ -262,7 +262,9 @@ prevent
 
 Back in S10, defenders in general weren't getting many tags, with the median being around a paltry 1.44 tags per minute (TPM). Making up for the meager median were two players who smashed through the 2.0 TPM threshhold, Abe Lincoln with 2.11 TPM and the infamous GriefSeeds with an astounding 2.38 TPM. The disparity between GriefSeeds' mechanical ability versus the rest of the defenders' mechanics from the Classical Era was immense. GriefSeeds received a lifetime ban from MLTP for botting in S7, which was then overturned due to lack of definitive evidence by the start of S8. He then continued to put up dominant mechanical performances that seemed to defy human limitations in S8 and S10, after which he unfortunately retired. To this day, players are still on both sides of the fence on whether or not there was cheating involved, but regardless of which viewpoint they take, most players agree it would be a miracle to see anything like it ever again in MLTP.
 
-S11 through S15 saw a relatively stable median for TPM, with each median falling with the 1.53-1.58 TPM range
+S11 through S15 saw a relatively stable median for TPM, with each median falling with the 1.53-1.58 TPM range. When considered in conjunction with the prevent numbers during the same time frame, we can see that the average defender was increasing their prevent while maintaining their tags. The average offenders were slowly but surely losing the war against the average defenders. S12 saw an anomaly towards the top end of the TPM spectrum, with the 2.0+ TPM club growing to a total of four players: CB13 (2.00), Abe Lincoln (2.04), and Iblis (2.10). 
+
+S16 through S19 saw a lower distribution of tagging prowess, with the median TPM being around 1.4, the top taggers rarely reaching even 1.8 TPM, and no players joining the 2+ TPM club. Keeping in mind that prevent numbers started dropping across these seasons as well, the data seems to point to the offenders beginning to push back against the defensive edge that had been building in the prior seasons. We will have to examine the offensive numbers as well before drawing any definitive conclusions.
 
 <br><br>
 
@@ -287,6 +289,10 @@ tags
 
 <br><br>
 
+I'll keep this one short and sweet, since the boxplot speaks for itself. S10 saw three players cross the 3+ K/D ratio barrier: GriefSeeds (3.07), Abe Lincoln (3.67), and Syniikal (5.82). For Season 11 and onwards, Syniikal crossed the 3+ K/D threshhold every single season and no other player managed to do so again, keeping the club at an exclusive three players. The median K/D ratio stayed fairly consistent from S10 through S15, before starting to lower monotonically from S16 through S18, and finally a slight increase again in S19. While the historical data makes it seem unlikely another player will join the 3+ club, but perhaps another player with enough discipline not to spike themselves frequently will arise one day.
+
+<br><br>
+
 ```{r echo = FALSE, warning = FALSE, message = FALSE}
 #KDR by defenders
 beeswarm(kdr ~ season, data = MLTP_defense_stats, pch = 16, col = rainbow(10), method = "hex",
@@ -305,6 +311,10 @@ kdr
 <br><br>
 
 #### Section D: Hold
+
+<br><br>
+
+Season 10 & 11 were the holding man's dreamscape. The median hold per minute (HPM) was around 11.5 HPM in both seasons, which even top holders struggled to achieve in the later seasons. In the last eight seasons combined, only one player (gg!) managed to get at least 14 HPM, yet three players in S10 and five players in S11 exceeded that threshhold. Starting in S12, with the advent of the prevent era (Preventaissance), the median HPM and the top HPM both started shifting drastically lower. By Season 15, the top holder, badger (11.24 HPM) was not even hitting the median holders from Season 10 or Season 11. Median hold numbers would continue to decrease in the subsequent seasons, although several players did manage to beat the S11 median HPM: WarriOrs (x3), bright (x2), DEAD NAN, okthenXD, gg!, and Messi. Interestingly, even though prevent numbers started to fall in S17 and S18, hold numbers continued to drop to an all-time low in S18, with a median HPM of a paltry 8.48 HPM, even with hold leader gg! putting up a dominant 14.02 HPM. What does this mean? 
 
 <br><br>
 
@@ -327,6 +337,18 @@ hold
 <br><br>
 
 #### Section E: Captures
+
+<br><br>
+
+Despite hold being high and prevent being low in Season 10, offenders were not able to score very many captures. The median captures per minute (CPM) was a scant 0.115 CPM, the lowest of the last ten seasons. Considering that tags were also low, we could characterize the season as being difficult to keep the flag in base, and difficult to get the flag reset. With both teams' flags frequently out of base, neither flag carrier was able to score. 
+
+In Season 11, there was a noticeable jump in CPM, with the median shooting up to 0.135. Hold stayed approximately the same as the previous season, while tags and prevent both increased. It's difficult to say exactly why CPM increased based on these stats alone, but the increased prevent indicates that the defenders were in base with the flag more than the previous season, likely due to the increasing popularity of anti-re, so offenders were given more opportunities to come into base with the flag while the defenders were blocking the other team out.
+
+Season 12 was possibly the most statistically enjoyable season for both offenders and defenders alike. While only the 6th highest median PPM, S12 was the highest in both median TPM & median CPM, and third in median HPM. Offenders were getting a decent amount of hold while getting a lot of caps, and the defense was getting lots of tags and keeping the flag in base enough for offenders to capture frequently. Teams felt like they were getting rewarded on the offensive end for getting good grabs and holds, and on the defensive end for keeping the flag safe and getting resets by playing anti-re and getting a high number of tags. I personally believe this lends some analytical evidence to the reason why many veteran players look back so fondly on Season 12 in particular.
+
+From Season 13 through Season 19, the median CPM was relatively stable, fluctuating around a baseline value of 0.13-0.14, with the exception of Season 17 (the season when the problematic servers were introduced and prevent began to fall). The hold numbers continuing to drop is probably the main reason that the median CPM will never be as high as it used to be; offenders will simply not have as much time with the flag to run in circles, and instead must draw upon crisp, dynamic pathing with the flag if they want to capture before the opponent can get in front of them and setup a defensive formation.
+
+The 15+ HPM club remains empty to this day, with toasty's Season 11 performance of 14.88 HPM being the closest any player has ever come. The 14+ HPM region contains eight players: MILKY (x2), toasty, Mr. Hat, Hulzy, BAN NAN (DEAD NAN), Stojakovic, gg!, and LEBRON*JAMES.
 
 <br><br>
 
@@ -386,6 +408,10 @@ cap_percent
 <br><br>
 
 #### Section H: Capture Differential
+
+<br><br>
+
+Capture differential per minute should be centered around zero, in theory. However, I have only included players with at least 120 minutes in the season, so the median capture differential per minute (CDPM) actually provides information on the performance of the substitute players who were just filling in for majors starters, or majors starters who were dropped from the team early in the season for poor performance  The main point of this section is to allow users to see how individual players did in particular seasons, and  
 
 <br><br>
 
