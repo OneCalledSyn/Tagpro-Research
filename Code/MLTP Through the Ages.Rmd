@@ -289,7 +289,7 @@ tags
 
 <br><br>
 
-I'll keep this one short and sweet, since the boxplot speaks for itself. S10 saw three players cross the 3+ K/D ratio barrier: GriefSeeds (3.07), Abe Lincoln (3.67), and Syniikal (5.82). For Season 11 and onwards, Syniikal crossed the 3+ K/D threshhold every single season and no other player managed to do so again, keeping the club at an exclusive three players. The median K/D ratio stayed fairly consistent from S10 through S15, before starting to lower monotonically from S16 through S18, and finally a slight increase again in S19. While the historical data makes it seem unlikely another player will join the 3+ club, but perhaps another player with enough discipline not to spike themselves frequently will arise one day.
+S10 saw three players cross the 3+ K/D ratio barrier: GriefSeeds (3.07), Abe Lincoln (3.67), and Syniikal (5.82). For Season 11 and onwards, Syniikal crossed the 3+ K/D threshhold every single season and no other player managed to do so again, keeping the club at an exclusive three players. The median K/D ratio stayed fairly consistent from S10 through S15, before starting to lower monotonically from S16 through S18, and finally a slight increase again in S19. While the historical data makes it seem unlikely another player will join the 3+ club, but perhaps another player with enough discipline not to spike themselves frequently will arise one day.
 
 <br><br>
 
@@ -372,6 +372,10 @@ caps
 
 <br><br>
 
+The median grabs per minute (GPM) was relatively low, sitting at only 1.47 GPM. In Season, there was a massive jump all the way up to a median GPM of 1.65 GPM, the most of any modern season. From there, GPM stayed roughly the same over the next two seasons, before starting to fall in Season 14 onwards, culminating with Season 19 median GPM approximately equivalent to the median GPM in S10, finally bringing us full circle after ten seasons. The only player to join the 2.0+ GPM club was protag in Season 14 with 2.03 GPM; I will toss an honorable mention as well to MILKY for his Season 12 performance with 1.9964 GPM, just barely missing the cutoff. 
+
+<br><br>
+
 ```{r echo = FALSE, warning = FALSE, message = FALSE}
 #Grabs for attackers
 beeswarm(gpm ~ season, data = MLTP_offense_stats, pch = 16, col = rainbow(10), method = "hex",
@@ -389,6 +393,10 @@ grabs
 <br><br>
 
 #### Section G: Scoring Percentage
+
+<br><br>
+
+The median scoring percentage in Season 10 was a pitiful 6.4%. In the ensuing seasons, the median scoring percentage had a general upwards trend, climbing to a peak median in Season 16 at a respectable 9.08% and settling in Season 19 at the slightly lower median of 8.76%. The elite club of players with a scoring percentage of at least 15% consists of only four members: Syniikal (x4), WarriOrs (x2), bright, and Ty. Interestingly, while leading the elite club, Syniikal also managed to put up a scoring percentage of exactly 0% in three separate seasons, which no other player has committed the iniquity of achieving even once.
 
 <br><br>
 
@@ -411,7 +419,7 @@ cap_percent
 
 <br><br>
 
-Capture differential per minute should be centered around zero, in theory. However, I have only included players with at least 120 minutes in the season, so the median capture differential per minute (CDPM) actually provides information on the performance of the substitute players who were just filling in for majors starters, or majors starters who were dropped from the team early in the season for poor performance  The main point of this section is to allow users to see how individual players did in particular seasons, and  
+Capture differential per minute should be centered around zero, in theory. However, I have only included players with at least 120 minutes in the season, so the median capture differential per minute (CDPM) actually provides information on the performance of the substitute players who were just filling in for majors starters, or majors starters who were dropped from the team for some reason (bans, underperforming, etc.) The higher the median CDPM on the boxplot, the worse the filler players performed, indicating that the strongest set of players were the starters. We can see that two of the weakest set of starters compared to the substitutes in a season were Season 11 and Season 14, with -0.046 CD and -0.055 CDPM respectively, while the strongest group of starters occurred in Season 12 with a +0.032 CDPM. Only five players ever managed to enter the 0.30+ CDPM clan: caramelbaays (0.363), Apopalypse (0.318), DOKE(0.306), Epiphany (0.303), and toasty (0.300).
 
 <br><br>
 
