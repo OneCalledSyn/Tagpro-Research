@@ -1,7 +1,7 @@
 ---
 title: "<center>MLTP: Data Visualization Through the Ages</center>"
 author: "<center>Jay Shapiro</center>"
-date: "<center>TBD</center>"
+date: "<center>1/29/2020</center>"
 output: 
   html_document:
     theme: cerulean
@@ -12,19 +12,19 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## Introduction
+<br><br>
+
+## Introduction: What is MLTP?
 
 <br><br>
 
-### What is MLTP?
+Tagpro is a capture the flag (CTF) web browser game played between two teams of four players each on a variety of tile-based maps.  Each person plays as a two-dimensional, paint-filled ball traversing the game with up/down/left/right keypresses as input. In competitive play, teams consist of two offenders and two defenders. The central objective is to grab the opponent's flag and carry it back without getting tagged with the imposition that teams may only capture if their flag is safe. 
 
-<br><br>
+Offenders focus their efforts on grabbing the flag, holding the flag, staying alive until an opportunity arises, and then pushing into their own base to attempt to get a capture. Other duties include helping their defense tag or contain the enemy flag carrier, fighting for powerups, blocking adversaries to assist their teammates, and getting *regrab*. Regrab refers to the strategy of having one offender wait in the opponent's base when their partner already has the opponent's flag. If the offensive partner is popped, the other offender will instantly grab the flag when it teleports back to the opponent's base. 
 
-To answer the above question, first we must answer the question "What is Tagpro?" Tagpro is an online, capture the flag (CTF) game generally played between two teams of four players on a variety of tile-based maps.  Each player is represented by a two-dimensional, paint-filled ball that rolls around the map using only cardinal direction keypresses (up/down/left/right) as input. In the competitive meta, teams typically consist of two primary offenders and two primary defenders. The main objective of the game for a team is to grab the other team's flag and bring it safely back to their own flag without getting tagged, with the imposition that teams can only score when their own flag is also safe in base. Offenders thus focus their efforts on grabbing the other team's flag, holding the flag and staying alive until an opportunity arises, and then pushing into their own base to attempt to get a capture. Other duties include helping their defense tag or contain the opposing flag carrier, fighting for powerups, blocking enemies to assist their teammates, and getting 'regrab'. Regrab refers to the strategy of having one offender wait in the opponent's base when their partner already has the opponent's flag, so that if the offensive partner is popped, the other offender will instantly grab the flag when it teleports back to the opponent's base. 
+Defenders will focus primarily on keeping the flag secure. When the flag is grabbed, the defenders are responsible for chasing the flag carrier and tagging him. When flag carriers are tagged, they pop, and the flag is teleported back to its home tile in the base. Other duties for defenders include fighting for powerups, blocking for their flag carrier, and playing *anti-re*. Anti-re, short for anti-regrab, is a strategy developed to counter regrab involving a player guarding the empty flag tile in their own base. The point of this maneuver is that once the enemy flag carrier dies and the flag teleports back, there is a player to defend the flag from the other team's regrab. 
 
-Defenders will focus primarily on keeping their team's flag secure on the flag tile, and if the other team manages to grab, they will be the ones primarily responsible for chasing the flag carrier and tagging him to return the flag; when a flag carrier is tagged, their ball pops and the flag is teleported back to its home tile in base. Other duties for defenders are fighting for powerups, blocking the other team so the flag carrier can come safely into base, and playing 'anti-re'. Anti-re is a strategy developed to counter regrab involveing a player guarding the empty flag tile in their own base. The point of this maneuver is that once the enemy flag carrier dies and the flag teleports back, there is a player to defend the flag from the other team's regrab. 
-
-Now that I've explained what Tagpro itself is, we can revisit the initial question: What is MLTP? MLTP is the premiere level of competitive Tagpro in the North American scene; the acronym stands for 'Major League TagPro'.  This data visualization project will showcase some of the primary metrics used to evaluate MLTP players and how the stats have changed across modern competitive seasons. Season 10 will be considered the first modern season for the purpose of this exploration, since it was the first season that anti-re saw widespread use in the competitive meta. Additionally, Season 10 was the first stats started being automatically captured and then imported to TagproLeague instead of in Excel documents. With the advent of that technology came many more statistics and metrics available that simply couldn't be recorded previously.
+With a basic understanding of the fundamentals of Tagpro, we can revisit the initial question: *What is MLTP?* MLTP is the premier level of competitive Tagpro in the North American scene; the acronym stands for **Major League TagPro**. I employ data visualization techniques to showcase the statistical categories MLTP players are judged upon and how the distributions evolved over time. Season 10 will be considered the first modern season for the purpose of this exploration for two primary reasons. First, it was the inaugural season for widely utilized anti-re in the competitive meta. Second, Season 10 was the first season that stats started being automatically recorded and imported to TagproLeague instead of manually entered into Excel documents. With the advent of TagproLeague came a variety of new metrics that were beyond the scope of the previous manual laborers.
 
 <br><br>
 
@@ -32,11 +32,22 @@ Now that I've explained what Tagpro itself is, we can revisit the initial questi
 
 <br><br>
 
-The main statistics used to holistically judge the individual performance of an offender are captures, grabs, scoring percentage, powerups, and hold. Captures is the number of times an offender scored, grabs is the number of times an offender picked up the flag, scoring percentage is the percentage of grabs that result in a capture: $(\frac{Captures}{Grabs})*100$, powerups is merely the number of powerups a player picked up, and hold is the duration of time an offender has the flag in their possession. 
+The main statistics used to holistically judge the performance of an offender are: 
 
-Defenders are holistically judged on prevent, tags, powerups, and kill/death ratio. Prevent is the duration of time the defender protected the flag from being grabbed, tags are the number of times a player kills a player on the other team, and (unsurprisingly) kill/death ratio is just: $\frac{Tags}{Pops}$, the number of tags divided by the number of pops.
+* Captures: the number of times an offender scored 
+* Grabs: the number of times an offender picked up the flag 
+* Scoring percentage: $(\frac{Captures}{Grabs})*100$ 
+* Powerups: the number of powerups a player picked up
+* Hold: the duration of time in seconds that an offender has the flag in their possession. 
 
-Finally, team success is typically measured using either win/loss/tie record or by capture differential. I will use capture differential for the purposes of this data visualization, as a quantitative measure of success is more useful in this case than a qualitative one, since winning by one capture is a much smaller indicator of success than winning by ten captures. 
+Defenders are holistically judged based on:
+
+* Prevent: the duration of time the defender protected the flag from being grabbed
+* Tags: the number of times a player pops a player on the other team
+* Kill/Death ratio: $\frac{Tags}{Pops}$
+* Powerups: the number of powerups a player picked up
+
+Finally, team success is typically measured using either win/loss/tie record or by capture differential. Capture differential is the logical choice, as we need some way to measure success quantitatively. For statistics that accrue over time, the values must be transformed to per-minute statistics since players have different amounts of playtime; fractional statistics do not require preprocessing.
 
 <br><br>
 
@@ -48,9 +59,9 @@ Finally, team success is typically measured using either win/loss/tie record or 
 
 <br><br>
 
-First, we consider a handful of interactive scatterplots comparing some of the defensive metrics to each other. In each plot, the size of the data point depicts the score differential per minute for that observation. Hovering over each observation will provide the player's name and the abscissa and ordinate values. Each plot also has a slider that controls which MLTP season is displayed on the graph; hitting 'Play" will have the plot cycle autonomously through the seasons for a full rotation, and manually clicking on a season in the slider will shift the plot directly to that season. 
+First, we consider a handful of interactive scatterplots comparing some of the defensive metrics to each other. In each plot, the size of the data point depicts the capture differential per minute for that observation. Hovering over a data point displays the player's name, abscissa, and ordinate. Each plot also has a slider that controls which MLTP season is displayed on the graph. Pressing the 'Play' button will have the graph cycle autonomously through the seasons for one full rotation, and manually clicking on a season in the slider will shift the plot directly to that season.  
 
-First, we compare tags per minute to prevent per minute, colored by the main position of the player in each observation. Comparing the two groups, defenders and offenders, gives a schema for what kind of stats a player should be getting for their position: 
+Tags per minute versus prevent per minute, colored by player position: 
 
 <br><br>
 
@@ -125,7 +136,7 @@ ppm_tpm_all
 
 <br><br>
 
-Next, we remove the offenders from the mix to only see the plot for the defenders. Although seeing the positional differences was useful, reducing the domain and and range of the axes provides a better picture of the subset of players for which the stats are actually important:
+Next, we remove the offenders from the mix to only see the plot for the defenders. Reducing the domain and range of the axes provides a better picture of the distribution of the defenders:
 
 <br><br>
 
@@ -219,9 +230,9 @@ hpm_gpm_o
 
 <br><br>
 
-Beeswarm plots are a magnificent way to visualize distributions of MLTP stats. Beeswarms show the individual observations as unique data points, unlike other distribution visualization techniques which often encode the data abstractly. For example, boxplots uses a box and whiskers to encapsulate all of the non-outlier observations and rely on quartiles and summary statistics. Histograms employ binning to group the data points into bars to display, again obscuring the individual observations. One of the main limitations of beeswarm plots is that for increasingly large datasets, it becomes more and more difficult to show each observation. Modern MLTP seasons typically have somewhere between 32 and 64 majors starters, depending on the number of teams. which falls into the optimal range for the number of observations a beeswarm plot contains.
+Beeswarm plots are a superb way to visualize MLTP statistical distributions.  Beeswarms show the individual observations as unique data points, unlike other distribution visualization techniques that often encode the data abstractly. For example, boxplots use a box and whiskers to encapsulate all of the non-outlier observations and rely on quartiles and summary statistics. Histograms assort the data for a continuous variable into different chunks, which are then displayed as bars, which obscures the individual data points. Showing each data point on a beeswarm plot becomes prohibitively difficult once the size of the dataset becomes too great. Modern MLTP seasons typically have between 32 and 64 majors starters, depending on the number of MLTP teams, which falls into the acceptable range for the number of observations a beeswarm plot should contain.
 
-To supplement each beeswarm plot, I have also included an interactive boxplot (a.k.a box-and-whiskers plot) with the individual data points slightly offset from the main body of the boxplot. Hovering over the box for each season will display the summary statistics for that box: minimum, maximum, first quartile, third quartile, median, and upper/lower fence if applicable. Hovering over each data point will give the player's name, the season, and the ordinate value. Toggling the colored boxes in the legend allows the box for each season to be removed or returned to the plot, and double-clicking on any of the boxes will display that season in isolation and remove all other seasons from the boxplot. Double-clicking on the box again will revert the plot back to its default display.
+To supplement each beeswarm plot, I have also included an interactive boxplot (a.k.a box-and-whiskers plot) with the individual player information next to each box. Hovering over the box for each season will display the summary statistics for that box: minimum, maximum, first quartile, third quartile, median, and upper/lower fence if applicable. Hovering over each data point will give the player's name, the season, and the ordinate value. Toggling the colored boxes in the legend allows each season to be removed or returned to the plot, and double-clicking on any of the boxes will display that season in isolation.
 
 <br><br>
 
@@ -229,13 +240,15 @@ To supplement each beeswarm plot, I have also included an interactive boxplot (a
 
 <br><br>
 
-We can see that defenders were not very adept at keeping the flag in base back in Season 10, with a median prevent per minute (PPM) of only 11.76, the highest was only 16.59 PPM from YoungSinatra, and the lowest was an abysmal 6.02 PPM from Gem. The following season was a little bit cleaner at the bottom end, with a minimum of 9.36 PPM, which raised the median up to 13.33 PPM. However, the maximum of 16.24 PPM from Bal McCartny suggests that the top defenders didn't manage to make any meaningful progress in shutting down offenses in S11 compared to S10. 
+Defenders were not very adept at keeping the flag in base back in Season 10, with a median prevent per minute (PPM) of only 11.76, a maximum of only 16.59 PPM from YoungSinatra, and a nadir of an abysmal 6.02 PPM from Gem. The following season was cleaner at the bottom end, with a minimum of 9.36 PPM, which raised the median up to 13.33 PPM. However, the maximum of 16.24 PPM from Bal McCartny suggests that the top defenders didn't manage to make any meaningful progress in shutting down offenses in S11 compared to S10. 
 
-Season 12 marked the beginning of the Preventaissance, with the Meme*Team defensive duo of Syniikal and YoungSinatra (xXw3Edl0rdXx) shattering all previous prevent records by staggering margins, with Syniikal having 19.93 PPM and YoungSinatra having 20.19 PPM, the first player in MLTP to ever break the 20+ PPM threshold. No player in any previous season had ever crossed even crossed 17 ppm, yet S12 saw a total of four players do so, with SIDE and EASHY coming in at 17.52 PPM and 17.33 PPM respectively. The median also saw another big jump, from 13.33 PPM up to 14.58 PPM. 
+Season 12 marked the beginning of the prevent Renaissance, dubbed the Preventaissance, with the Meme*Team defensive duo of Syniikal and YoungSinatra (xXw3Edl0rdXx).  The pair obliterated the previous records by staggering margins, with Syniikal achieving 19.93 PPM and Young Sinatra putting up 20.19 PPM. Young Sinatra became the first player ever to cross the 20+ PPM threshold, setting a high bar for aspiring defenders. The median also took a big leap from 13.33 PPM up to 14.58 PPM. 
 
-S13 saw defensive prowess continue to fluorish, with the median prevent continuing to climb up to 15.75 PPM. Syniikal finishing with a solid 20.05 PPM placed him as the second player to ever cross the 20+ PPM barrier, and seven other players would join him in the 17+ club that season: C Bivvey, alchemist, BALLDON'TLIE, iAaronK, aardvark, siDe, and Eashy. S14 brought a period of stagnation for most of the league, with the median moving almost imperceptibly up to 15.90 PPM. Syniikal achieved a mind-blowing 25.14 PPM, over 9 PPM greater than the median, becoming the first and almost certainly the only player to ever cross the 25+ PPM threshold.
+S13 saw defensive prowess continue to flourish, with the median prevent continuing to climb up to 15.75 PPM. Syniikal finished the season with 20.05 PPM, becoming the second player to break the 20+ PPM barrier. S14 brought a period of stagnation for most of the league, with the median moving almost imperceptibly up to 15.90 PPM. However, Syniikal still achieved a mind-blowing 25.14 PPM, becoming the first and only player ever to cross the 25+ PPM threshold.
 
-S15 and S16 both saw miniscule increases in the median PPM, again with Syniikal leading the pack in both seasons. S16 saw HERB become the third member to join the 20+ PPM crew. S10-S16 saw monotonic increases in the median PPM, but a major change in S17 would shake the game to its very core. S17 saw the game's creator, known in-game as 'LuckySpammer', remove every extant Tagpro server and replace them with new ones from a different provider. For many players, the new servers were a direct downgrade and complaints of bad ping and server instability plagued the league like never before. S17 marked the first season in the modern era where the median PPM had fallen from the previous season. This didn't stop BigBird (or Syniikal) however, as BigBird still managed to accrue 20.69 PPM, becoming the 4th player to join the 20+ PPM club, and the only one who managed it without being Syniikal's partner. The median prevent continued to nosedive in S18 all the way down to 14.58 PPM, lower than it had been since S11. S19 saw a very slight recovery in the median prevent, but the distribution looks fairly similar to the S18 distribution. Syniikal, playing as TomatoFarmer, once again topped the prevent leaderboard with his seventh straight season of not only being first in prevent, but having over 20 PPM. Only time will tell if the defenders will be able to shore up their collective in-base acumen or if the offenders have ultimately begun to turn the tide in the North American competitive scene.
+S15 and S16 both saw minuscule increases in the median PPM, again with Syniikal leading the pack in both seasons. S16 saw Syniikal's partner, HERB, become the third member to join the 20+ PPM crew. In S17, the game's creator, known in-game as **LuckySpammer**, removed every extant Tagpro server and replaced them with new ones from a different provider. The new servers were a direct downgrade for many players, and complaints about poor connection, high ping, and server instability plagued the league. Season 17 marked the first season in the modern era in which the median PPM had fallen from the previous season. This didn't slow down BigBird as he managed to accrue a hefty 20.69 PPM. BigBird became the 4th player to join the 20+ PPM club and the only one who managed to do so without being Syniikal or his partner. 
+
+The median PPM continued to nosedive in S18 all the way down to 14.58 PPM, lower than it had been since S11. S19 saw a very slight recovery in the median PPM, but the distribution looks similar to the S18 distribution. Syniikal, playing as TomatoFarmer, once again used his experience to wield the prevent crown, dominating the leaderboard for the seventh straight season.
 
 <br><br>
 
@@ -260,11 +273,11 @@ prevent
 
 <br><br>
 
-Back in S10, defenders in general weren't getting many tags, with the median being around a paltry 1.44 tags per minute (TPM). Making up for the meager median were two players who smashed through the 2.0 TPM threshhold, Abe Lincoln with 2.11 TPM and the infamous GriefSeeds with an astounding 2.38 TPM. The disparity between GriefSeeds' mechanical ability versus the rest of the defenders' mechanics from the Classical Era was immense. GriefSeeds received a lifetime ban from MLTP for botting in S7, which was then overturned due to lack of definitive evidence by the start of S8. He then continued to put up dominant mechanical performances that seemed to defy human limitations in S8 and S10, after which he unfortunately retired. To this day, players are still on both sides of the fence on whether or not there was cheating involved, but regardless of which viewpoint they take, most players agree it would be a miracle to see anything like it ever again in MLTP.
+Back in S10, most defenders struggled to get tags, with the median being a paltry 1.44 tags per minute (TPM). Even though the median TPM was low, the founders of the 2.0+ TPM club were born:  Abe Lincoln weighing in at 2.11 TPM and the infamous GriefSeeds with an astounding 2.38 TPM. The mechanical skill disparity between GriefSeeds and the rest of the defenders from the Classical Era was immense. GriefSeeds received a lifetime ban from MLTP for botting in S7, which was then overturned due to a lack of definitive evidence by the start of S8. He then continued to put up dominant mechanical performances that seemed to defy human limitations in S8 and S10, after which he unfortunately retired. Despite the community still being split on whether or not cheating was involved, none could deny the performances GriefSeeds shared with us were magnificent. Inducted into the Ball of Fame after his incredible Season 10 performance, he received approval from 100% of the voters.
 
-S11 through S15 saw a relatively stable median for TPM, with each median falling with the 1.53-1.58 TPM range. When considered in conjunction with the prevent numbers during the same time frame, we can see that the average defender was increasing their prevent while maintaining their tags. The average offenders were slowly but surely losing the war against the average defenders. S12 saw an anomaly towards the top end of the TPM spectrum, with the 2.0+ TPM club growing to a total of four players: CB13 (2.00), Abe Lincoln (2.04), and Iblis (2.10). 
+S11 through S15 saw a stable median TPM, with each falling within the 1.53-1.58 TPM range. When considered in conjunction with the prevent numbers during the same time frame, we can see that the average defender increased PPM numbers while maintaining TPM. S12 saw an anomaly towards the top end of the TPM spectrum, with the 2.0+ TPM club growing to a total of four players: CB13 (2.00), Abe Lincoln (2.04), and Iblis (2.10). 
 
-S16 through S19 saw a lower distribution of tagging prowess, with the median TPM being around 1.4, the top taggers rarely reaching even 1.8 TPM, and no players joining the 2+ TPM club. Keeping in mind that prevent numbers started dropping across these seasons as well, the data seems to point to the offenders beginning to push back against the defensive edge that had been building in the prior seasons. We will have to examine the offensive numbers as well before drawing any definitive conclusions.
+S16 through S19 saw a lower distribution of tagging prowess, with the median TPM being around 1.4, the top taggers rarely reaching even 1.8 TPM, and no players joining the 2+ TPM club. Considering that prevent numbers were declining across those seasons, the data points to the offenders pushing back against the defensive edge that had been built in the prior seasons.
 
 <br><br>
 
@@ -289,7 +302,7 @@ tags
 
 <br><br>
 
-S10 saw three players cross the 3+ K/D ratio barrier: GriefSeeds (3.07), Abe Lincoln (3.67), and Syniikal (5.82). For Season 11 and onwards, Syniikal crossed the 3+ K/D threshhold every single season and no other player managed to do so again, keeping the club at an exclusive three players. The median K/D ratio stayed fairly consistent from S10 through S15, before starting to lower monotonically from S16 through S18, and finally a slight increase again in S19. While the historical data makes it seem unlikely another player will join the 3+ club, but perhaps another player with enough discipline not to spike themselves frequently will arise one day.
+S10 saw three players cross the 3+ K/D ratio barrier: GriefSeeds (3.07), Abe Lincoln (3.67), and Syniikal (5.82). Syniikal crossed the 3+ K/D threshold every single season; no other player managed to do so after S10, which kept the club at an exclusive three players. The median K/D ratio stayed consistent from S10 through S15, before starting to decrease monotonically in S16 through S18, and then increased slightly again in S19. While the historical data makes it seem unlikely another player will join the 3+ club, perhaps another player with enough discipline will arise one day.
 
 <br><br>
 
@@ -314,7 +327,9 @@ kdr
 
 <br><br>
 
-Season 10 & 11 were the holding man's dreamscape. The median hold per minute (HPM) was around 11.5 HPM in both seasons, which even top holders struggled to achieve in the later seasons. In the last eight seasons combined, only one player (gg!) managed to get at least 14 HPM, yet three players in S10 and five players in S11 exceeded that threshhold. Starting in S12, with the advent of the prevent era (Preventaissance), the median HPM and the top HPM both started shifting drastically lower. By Season 15, the top holder, badger (11.24 HPM) was not even hitting the median holders from Season 10 or Season 11. Median hold numbers would continue to decrease in the subsequent seasons, although several players did manage to beat the S11 median HPM: WarriOrs (x3), bright (x2), DEAD NAN, okthenXD, gg!, and Messi. Interestingly, even though prevent numbers started to fall in S17 and S18, hold numbers continued to drop to an all-time low in S18, with a median HPM of a paltry 8.48 HPM, even with hold leader gg! putting up a dominant 14.02 HPM. What does this mean? 
+Season 10 & 11 were the holding man's dreamscape. The median hold per minute (HPM) was around 11.5 HPM in both seasons, which even top holders struggled to achieve in the later seasons. In the last eight seasons combined, only one player (gg!) managed to get at least 14 HPM, yet three players in S10 and five players in S11 exceeded that threshhold. 
+
+Starting in S12, with the advent of the prevent era (Preventaissance), the median HPM and the top HPM both started shifting drastically lower. By S15, the hold leader, badger (11.24 HPM), was unable to reach the hold numbers that the median offenders could in Season 10 or Season 11. Median HPM continued to decrease in subsequent seasons, although several players did manage to beat the S11 median HPM: WarriOrs (x3), bright (x2), DEAD NAN, okthenXD, gg!, and Messi. Even though PPM started to fall in S17 and S18, HPM continued to drop to an all-time low in S18. Despite hold leader gg! finding a way to put up a dominant 14.02 HPM, the median HPM was only a paltry 8.48 HPM. 
 
 <br><br>
 
@@ -340,13 +355,13 @@ hold
 
 <br><br>
 
-Despite hold being high and prevent being low in Season 10, offenders were not able to score very many captures. The median captures per minute (CPM) was a scant 0.115 CPM, the lowest of the last ten seasons. Considering that tags were also low, we could characterize the season as being difficult to keep the flag in base, and difficult to get the flag reset. With both teams' flags frequently out of base, neither flag carrier was able to score. 
+Despite hold being high and prevent being low in Season 10, offenders were not able to score very many captures. The median captures per minute (CPM) was a scant 0.115 CPM, the worst of any modern season. With low median values for TPM and PPM in Season 10, defenders struggled to keep the flag in the base and get the flag reset. With both flags frequently being held simultaneously, neither flag carrier had opportunities to capture.  
 
-In Season 11, there was a noticeable jump in CPM, with the median shooting up to 0.135. Hold stayed approximately the same as the previous season, while tags and prevent both increased. It's difficult to say exactly why CPM increased based on these stats alone, but the increased prevent indicates that the defenders were in base with the flag more than the previous season, likely due to the increasing popularity of anti-re, so offenders were given more opportunities to come into base with the flag while the defenders were blocking the other team out.
+In Season 11, there was a noticeable jump, with the median shooting up to 0.135 CPM. Hold stayed approximately the same as the previous season, while tags and prevent both increased. The increased prevent indicates that the defenders protected the flag more than the previous season. A large part of this phenomenon was the ever-increasing popularity of anti-re. Offenders were given more opportunities to capture while the defenders were blocking the other team out.
 
-Season 12 was possibly the most statistically enjoyable season for both offenders and defenders alike. While only the 6th highest median PPM, S12 was the highest in both median TPM & median CPM, and third in median HPM. Offenders were getting a decent amount of hold while getting a lot of caps, and the defense was getting lots of tags and keeping the flag in base enough for offenders to capture frequently. Teams felt like they were getting rewarded on the offensive end for getting good grabs and holds, and on the defensive end for keeping the flag safe and getting resets by playing anti-re and getting a high number of tags. I personally believe this lends some analytical evidence to the reason why many veteran players look back so fondly on Season 12 in particular.
+Season 12 was possibly the most statistically enjoyable season for both offenders and defenders alike. While S12 had only the 6th highest median PPM, it was also first in both median TPM & median CPM and third in median HPM. Offenders were getting a decent amount of hold while getting a lot of caps. Defenders were getting lots of tags and keeping the flag in base enough for offenders to capture frequently. Offenders got rewarded for good grabs and hold, while defenders got rewarded for keeping the flag safe and getting resets by playing effective anti-re. I personally believe this lends some analytical evidence to the reason why many veteran players look back so fondly on Season 12.
 
-From Season 13 through Season 19, the median CPM was relatively stable, fluctuating around a baseline value of 0.13-0.14, with the exception of Season 17 (the season when the problematic servers were introduced and prevent began to fall). The hold numbers continuing to drop is probably the main reason that the median CPM will never be as high as it used to be; offenders will simply not have as much time with the flag to run in circles, and instead must draw upon crisp, dynamic pathing with the flag if they want to capture before the opponent can get in front of them and setup a defensive formation.
+From Season 13 through Season 19, the median CPM was relatively stable, fluctuating around a baseline value of 0.13-0.14, except Season 17 (the server debacle season). The hold numbers continuing to drop is probably the main reason that the median CPM will never be as high as it used to be. Offenders will simply not have as much time to run in circles with the flag. Instead, offenders are relying upon quick, dynamic paths with the flag to notch a crisp capture before the defenders can catch up.
 
 The 15+ HPM club remains empty to this day, with toasty's Season 11 performance of 14.88 HPM being the closest any player has ever come. The 14+ HPM region contains eight players: MILKY (x2), toasty, Mr. Hat, Hulzy, BAN NAN (DEAD NAN), Stojakovic, gg!, and LEBRON*JAMES.
 
@@ -372,7 +387,7 @@ caps
 
 <br><br>
 
-The median grabs per minute (GPM) was relatively low, sitting at only 1.47 GPM. In Season, there was a massive jump all the way up to a median GPM of 1.65 GPM, the most of any modern season. From there, GPM stayed roughly the same over the next two seasons, before starting to fall in Season 14 onwards, culminating with Season 19 median GPM approximately equivalent to the median GPM in S10, finally bringing us full circle after ten seasons. The only player to join the 2.0+ GPM club was protag in Season 14 with 2.03 GPM; I will toss an honorable mention as well to MILKY for his Season 12 performance with 1.9964 GPM, just barely missing the cutoff. 
+The median grabs per minute (GPM) was relatively low in S10, sitting at only 1.47 GPM. In Season 11, the median GPM jumped to 1.65 GPM.  Median GPM stayed roughly the same over the next two seasons, before starting to fall starting in Season 14, culminating with the median GPM in S19 approximately equivalent to the median GPM in S10, bringing us full circle after ten seasons. The only player to join the 2.0+ GPM club was protag with 2.03 GPM in Season 14. An honorable mention goes to MILKY for his Season 12 performance with 1.9964 GPM, just barely missing the cutoff to join the elite club. 
 
 <br><br>
 
@@ -396,7 +411,7 @@ grabs
 
 <br><br>
 
-The median scoring percentage in Season 10 was a pitiful 6.4%. In the ensuing seasons, the median scoring percentage had a general upwards trend, climbing to a peak median in Season 16 at a respectable 9.08% and settling in Season 19 at the slightly lower median of 8.76%. The elite club of players with a scoring percentage of at least 15% consists of only four members: Syniikal (x4), WarriOrs (x2), bright, and Ty. Interestingly, while leading the elite club, Syniikal also managed to put up a scoring percentage of exactly 0% in three separate seasons, which no other player has committed the iniquity of achieving even once.
+The median scoring percentage in Season 10 was a pitiful 6.4%. In the ensuing seasons, the median scoring percentage trended upward, climbing to a peak in Season 16 at a respectable 9.08% and settling at 8.76% in Season 19. The elite club of players with a scoring percentage of at least 15% consists of only four members: Syniikal (x4), WarriOrs (x2), bright, and Ty. Syniikal also managed to put up a scoring percentage of 0% in three separate seasons, which no other player has committed the iniquity of achieving even once.
 
 <br><br>
 
@@ -419,7 +434,7 @@ cap_percent
 
 <br><br>
 
-Capture differential per minute should be centered around zero, in theory. However, I have only included players with at least 120 minutes in the season, so the median capture differential per minute (CDPM) actually provides information on the performance of the substitute players who were just filling in for majors starters, or majors starters who were dropped from the team for some reason (bans, underperforming, etc.) The higher the median CDPM on the boxplot, the worse the filler players performed, indicating that the strongest set of players were the starters. We can see that two of the weakest set of starters compared to the substitutes in a season were Season 11 and Season 14, with -0.046 CD and -0.055 CDPM respectively, while the strongest group of starters occurred in Season 12 with a +0.032 CDPM. Only five players ever managed to enter the 0.30+ CDPM clan: caramelbaays (0.363), Apopalypse (0.318), DOKE(0.306), Epiphany (0.303), and toasty (0.300).
+Theoretically, the capture differential per minute should be centered around zero since Tagpro is a zero-sum game. However, only players with at least 120 minutes played in the season are included in the dataset. Now the median capture differential per minute (CDPM) actually provides information on the performance of the substitute players who were just filling in for majors starters. The higher a season's median CDPM, the worse the filler players performed. Two of the weakest sets of players compared to the substitutes were Season 11 and Season 14 with -0.046 CDPM and -0.055 CDPM, respectively. The strongest group of starters occurred in the crowd favorite Season 12, with a +0.032 CDPM. Only five players ever managed to enter the 0.30+ CDPM clan: caramelbaays (0.363), Apopalypse (0.318), DOKE(0.306), Epiphany (0.303), and toasty (0.300).
 
 <br><br>
 
@@ -442,7 +457,7 @@ cap_diff
 
 <br><br>
 
-I have created beeswarms and boxplots for some of the stat categories that are rarely talked about in competitive play, but may still be of interest. Unlike the previous sections, I will merely display the distributions and eschew any explanations.
+I have created beeswarms and boxplots for some of the stat categories that are rarely talked about in competitive play, but may still be of interest. Unlike the previous sections, I have merely displayed the distributions for perusal and eschewed any explanations.
 
 <br><br>
 
