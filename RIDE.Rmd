@@ -1,0 +1,546 @@
+---
+title: "<center>Rolling in Data: Exploring the Dynamics of Elite TagPro Matches Through Statistical Analysis</center>"
+author: "<center>REDACTED</center>"
+date: "<center>3/4/2023</center>"
+output: 
+  html_document:
+    theme: cerulean
+  pdf_document: default 
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+<br><br>
+
+## Introduction: What is MLTP?
+
+<br><br>
+
+Tagpro is a capture the flag (CTF) web browser game played between two teams of four players each on a variety of tile-based maps.  Each person plays as a two-dimensional, paint-filled ball traversing the game with up/down/left/right keypresses as input. In competitive play, teams consist of two offenders and two defenders. The central objective is to grab the opponent's flag and carry it back without getting tagged with the imposition that teams may only capture if their flag is safe. 
+
+Offenders focus their efforts on grabbing the flag, holding the flag, staying alive until an opportunity arises, and then pushing into their own base to attempt to get a capture. Other duties include helping their defense tag or contain the enemy flag carrier, fighting for powerups, blocking adversaries to assist their teammates, and getting *regrab*. Regrab refers to the strategy of having one offender wait in the opponent's base when their partner already has the opponent's flag. If the offensive partner is popped, the other offender will instantly grab the flag when it teleports back to the opponent's base. 
+
+Defenders will focus primarily on keeping the flag secure. When the flag is grabbed, the defenders are responsible for chasing the flag carrier and tagging him. When flag carriers are tagged, they pop, and the flag is teleported back to its home tile in the base. Other duties for defenders include fighting for powerups, blocking for their flag carrier, and playing *anti-re*. Anti-re, short for anti-regrab, is a strategy developed to counter regrab involving a player guarding the empty flag tile in their own base. The point of this maneuver is that once the enemy flag carrier dies and the flag teleports back, there is a player to defend the flag from the other team's regrab. 
+
+With a basic understanding of the fundamentals of Tagpro, we can revisit the initial question: *What is MLTP?* MLTP is the premier level of competitive Tagpro in the North American scene; the acronym stands for **Major League TagPro**. We employ data visualization techniques to showcase the statistical categories MLTP players are judged upon and how the distributions of those statistics evolved over time. Season 10 will be considered the first modern season for the purpose of this exploration for two primary reasons. First, it was the inaugural season for widely utilized anti-re in the competitive meta. Second, Season 10 was the first season that stats started being automatically recorded and imported to TagproLeague, instead of manually entered into Excel documents that have been lost to the annals of time. With the advent of TagproLeague came a variety of new raw stats that were beyond the scope of the previous 'manual laborers' in charge of statkeeping.
+
+<br><br>
+
+### Metrics for Player Evaluation
+
+<br><br>
+
+The main statistics used to holistically judge the performance of an offender are typically: 
+
+* Captures: the number of times an offender scored 
+* Grabs: the number of times an offender picked up the flag 
+* Scoring percentage: $(\frac{Captures}{Grabs})*100$ 
+* Powerups: the number of powerups a player picked up
+* Hold: the duration of time in seconds that an offender has the flag in their possession. 
+
+While for defenders the statistics of choice are often:
+
+* Prevent: the duration of time the defender protected the flag from being grabbed
+* Tags: the number of times a player pops a player on the other team
+* Kill/Death ratio: $\frac{Tags}{Pops}$
+* Powerups: the number of powerups a player picked up
+
+<br>
+
+Interestingly, the agglomeration metrics that are by the far the most prevalent to discuss the overall performance of an individual player, whether it be offense, defense, or as a whole, do not include powerups at all. Is this an oversight or is there merit to leaving out powerups when talking about performance? GASP and NISH are the two current "gold standard" metrics for player performance, but back during the era of their creation, powerups were simply not one of the statistics that were tracked and recorded manually by the statkeepers. The creators merely took the path of least resistance and never dreamed of including information that wasn't already at their fingertips. Nowadays, the raw stats automatically captured by the data collection scripts to be transformed and warehoused by TagProLeague offers analysts and statisticians a far wider array of options to select from to build a player evaluation metric.
+
+<br>
+
+Two of the most famous statistical metrics employed by the TagPro community across every competitive region are known as GASP and NISH. GASP is based more on aggregation of a player's total contribution to his team throughout a season, whereas NISH is largely based on per minute statistics, measuring instead a player's average contribution over a minute of playtime. Both GASP and NISH are comprised of three subcategories (O/D/T) for offense, defense, and total player rating. Since NISH is basically a per minute version of GASP with the addition of cap differential, we will focus on just explaining how GASP works in depth. First, the stats for all players in the league are calculated over a certain period of time, usually weekly or seasonally and occasionally over all-time. Next, the mean and standard deviation is calculated for each statistic for the entire set of players in the league. Then, each individual's values for each statistics are standardized with respect to the full set of players. These standardized values are weighted as follows to produce raw O/D/T scores:
+
+$Raw O score = 2 * Caps Per Minute + 2 * Scoring Percentage + 5 * Caps + 4 * Hold$
+
+$Raw D score = 2 * Returns Per Minute + KDR + 2 * Non Return Tags Per Minute + 4 * Returns + 4 * Prevent$ 
+
+$Raw T score = Raw D score + Raw O score$
+
+From the raw scores, the GASP is calculated by taking the percentile rank of each raw score and multiplying by 10, giving a final value between 0-10 for O/D/T GASP. NISH is calculated in a similar manner as mentioned before but the final output range is instead 0-100.
+
+Finally, team success is typically measured using either win/loss/tie record or by capture differential. Capture differential is the logical choice, as we need some way to measure success quantitatively. For statistics that accrue over time, the values must be transformed to per-minute statistics since players have different amounts of playtime; fractional statistics do not require such preprocessing.
+
+<br><br>
+
+##  Exploration
+
+<br><br>
+
+### Part I: Defense Scatterplots
+
+<br><br>
+
+First, we consider a handful of interactive scatterplots comparing some of the defensive metrics to each other. In each plot, the size of the data point depicts the capture differential per minute for that observation. Hovering over a data point displays the player's name, abscissa, and ordinate. Each plot also has a slider that controls which MLTP season is displayed on the graph. Pressing the 'Play' button will have the graph cycle autonomously through the seasons for one full rotation, and manually clicking on a season in the slider will shift the plot directly to that season.  
+
+Tags per minute versus prevent per minute, colored by player position: 
+
+<br><br>
+
+```{r echo = FALSE, warning = FALSE, message = FALSE}
+library(tidyverse)
+library(ggplot2)
+library(ggfortify)
+library(plotly)
+library(data.table)
+library(factoextra)
+library(pls)
+library(beeswarm)
+
+MLTPfiles <- list.files(path = "C:/Users/jshap/OneDrive/Desktop/Stats/",
+                        pattern = "*.tsv", full.names = TRUE)
+
+MLTP_master_stats <- data.frame()
+
+for (lambda in c(1:10)) {
+  location <- MLTPfiles[lambda]
+  temp <- fread(file = location, 
+                sep = "\t", fill = TRUE, header = TRUE) %>% mutate(season = as.factor(lambda + 9))
+  
+  MLTP_master_stats <- rbind(MLTP_master_stats, temp, fill = TRUE)
+}
+
+#str(MLTP_master_stats)
+
+MLTP_normalized_stats<- mutate(MLTP_master_stats, scpm = score/minutes, success_rate = pm/minutes, tpm = tags/minutes, 
+                               poppm = pops/minutes, droppm = drops/minutes, gpm = grabs/minutes,
+                               hpm = hold/minutes, cpm = captures/minutes, ppm = prevent/minutes, rpm = returns/minutes,
+                               pupm = pups/minutes, kdr = tags/pops, limp = flaccids/minutes, LHpm = longholds/minutes, 
+                               handpm = handoff/minutes, GHpm = goodhandoff/minutes, gorepm = goregrab/minutes, corepm = coregrab/minutes,
+                               copm = cohandoff/minutes, inbasepm = retinbase/minutes, quickpm = quickret/minutes, savepm = saves/minutes,
+                               HApm = holdagainst/minutes, cap_per = (captures/grabs)*100)
+
+MLTP_filtered_stats <- MLTP_normalized_stats %>%
+  filter(minutes >= 120) %>%
+  select(-c(V28, team, pupscomp, score, minutes, pm, tags, pops, grabs, drops, hold, captures, prevent, returns,
+            pups, pupscomp, flaccids, longholds, handoff, goodhandoff, goregrab, gohandoff, cohandoff, retinbase,
+            quickret, saves, holdagainst, coregrab)) %>%
+    mutate(position = ifelse(ppm > hpm, "Defense", "Offense"))
+
+MLTP_defense_stats <- MLTP_filtered_stats %>%
+  filter(ppm > hpm)
+
+MLTP_offense_stats <- MLTP_filtered_stats %>%
+  filter(hpm > ppm)
+
+ppm_tpm_all <- MLTP_filtered_stats %>%
+  plot_ly(
+    x = ~ppm, 
+    y = ~tpm, 
+    size = ~success_rate, 
+    color = ~position, 
+    frame = ~season, 
+    text = ~player, 
+    hovertemplate = paste("<b>%{text}</b><br><br>",
+                          "%{yaxis.title.text}: %{y}<br>",
+                          "%{xaxis.title.text}: %{x}<br>",
+                          "<extra></extra>"),
+    type = 'scatter',
+    mode = 'markers'
+  ) %>%
+    animation_opts(frame = 1500, easing = NULL, redraw = FALSE) %>%
+      layout(scene = list(xaxis = list(title = 'Prevent Per Minute'),
+                          yaxis = list(title = 'Tags Per Minute')),
+                          title = "PPM vs TPM for Both Positions")
+
+ppm_tpm_all
+```
+
+<br><br>
+
+Next, we remove the offenders from the mix to only see the plot for the defenders. Reducing the domain and range of the axes provides a better picture of the distribution of the defenders:
+
+<br><br>
+
+```{r echo = FALSE, warning = FALSE, message = FALSE}
+ppm_tpm_d <- MLTP_defense_stats %>%
+  plot_ly(
+    x = ~ppm, 
+    y = ~tpm, 
+    size = ~success_rate, 
+    color = ~position, 
+    frame = ~season, 
+    text = ~player, 
+    hovertemplate = paste("<b>%{text}</b><br><br>",
+                    "%{yaxis.title.text}: %{y}<br>",
+                    "%{xaxis.title.text}: %{x}<br>",
+                    "<extra></extra>"),
+    type = 'scatter',
+    mode = 'markers'
+  ) %>%
+  animation_opts(frame = 1500, easing = NULL, redraw = FALSE) %>%
+    layout(scene = list(xaxis = list(title = 'Prevent Per Minute'),
+                        yaxis = list(title = 'Tags Per Minute')),
+                        title = "PPM vs TPM for Defenders")
+
+ppm_tpm_d
+```
+
+<br><br>
+
+### Part II: Offense Scatterplots
+
+<br><br>
+
+Now we employ the same technique for hold per minute compared to grabs per minute, again presenting both positions separated by color, and then a subset including only the offenders:
+
+<br><br>
+
+```{r echo = FALSE, warning = FALSE, message = FALSE}
+hpm_gpm_all <- MLTP_filtered_stats %>%
+  plot_ly(
+    x = ~gpm, 
+    y = ~hpm, 
+    size = ~success_rate, 
+    color = ~position, 
+    frame = ~season, 
+    text = ~player, 
+    hovertemplate = paste("<b>%{text}</b><br><br>",
+                    "%{yaxis.title.text}: %{y}<br>",
+                    "%{xaxis.title.text}: %{x}<br>",
+                    "<extra></extra>"),
+    type = 'scatter',
+    mode = 'markers'
+  ) %>%
+  animation_opts(frame = 1500, easing = NULL, redraw = FALSE) %>%
+    layout(scene = list(xaxis = list(title = 'Grabs Per Minute'),
+                        yaxis = list(title = 'Hold Per Minute')),
+                        title = "GPM vs HPM for Both Positions")
+
+hpm_gpm_all
+```
+
+<br><br>
+
+```{r echo = FALSE, warning = FALSE, message = FALSE}
+hpm_gpm_o <- MLTP_offense_stats %>%
+  plot_ly(
+    x = ~gpm, 
+    y = ~hpm, 
+    size = ~success_rate, 
+    color = ~position, 
+    frame = ~season, 
+    text = ~player, 
+    hovertemplate = paste("<b>%{text}</b><br><br>",
+                    "%{yaxis.title.text}: %{y}<br>",
+                    "%{xaxis.title.text}: %{x}<br>",
+                    "<extra></extra>"),
+    type = 'scatter',
+    mode = 'markers'
+  ) %>%
+  animation_opts(frame = 1500, easing = NULL, redraw = FALSE) %>%
+    layout(scene = list(xaxis = list(title = 'Grabs Per Minute'),
+                        yaxis = list(title = 'Hold Per Minute')),
+                        title = "GPM vs HPM for Offenders")
+
+hpm_gpm_o
+```
+
+<br><br>
+
+### Part III: Distribution Visualization
+
+<br><br>
+
+Beeswarm plots are a superb way to visualize MLTP statistical distributions.  Beeswarms show the individual observations as unique data points, unlike other distribution visualization techniques that often encode the data abstractly. For example, boxplots use a box and whiskers to encapsulate all of the non-outlier observations and rely on quartiles and summary statistics. Histograms assort the data for a continuous variable into different chunks, which are then displayed as bars, which obscures the individual data points. Showing each data point on a beeswarm plot becomes prohibitively difficult once the size of the dataset becomes too great. Modern MLTP seasons typically have between 32 and 64 majors starters, depending on the number of MLTP teams, which falls into the acceptable range for the number of observations a beeswarm plot should contain.
+
+To supplement each beeswarm plot, I have also included an interactive boxplot (a.k.a box-and-whiskers plot) with the individual player information next to each box. Hovering over the box for each season will display the summary statistics for that box: minimum, maximum, first quartile, third quartile, median, and upper/lower fence if applicable. Hovering over each data point will give the player's name, the season, and the ordinate value. Toggling the colored boxes in the legend allows each season to be removed or returned to the plot, and double-clicking on any of the boxes will display that season in isolation.
+
+<br><br>
+
+#### Section A: Prevent
+
+<br><br>
+
+Defenders were not very adept at keeping the flag in base back in Season 10, with a median prevent per minute (PPM) of only 11.76, a maximum of only 16.59 PPM from YoungSinatra, and a nadir of an abysmal 6.02 PPM from Gem. The following season was cleaner at the bottom end, with a minimum of 9.36 PPM, which raised the median up to 13.33 PPM. However, the maximum of 16.24 PPM from Bal McCartny suggests that the top defenders didn't manage to make any meaningful progress in shutting down offenses in S11 compared to S10. 
+
+Season 12 marked the beginning of the prevent Renaissance, dubbed the Preventaissance, with the Meme*Team defensive duo of Syniikal and YoungSinatra (xXw3Edl0rdXx).  The pair obliterated the previous records by staggering margins, with Syniikal achieving 19.93 PPM and Young Sinatra putting up 20.19 PPM. Young Sinatra became the first player ever to cross the 20+ PPM threshold, setting a high bar for aspiring defenders. The median also took a big leap from 13.33 PPM up to 14.58 PPM. 
+
+S13 saw defensive prowess continue to flourish, with the median prevent continuing to climb up to 15.75 PPM. Syniikal finished the season with 20.05 PPM, becoming the second player to break the 20+ PPM barrier. S14 brought a period of stagnation for most of the league, with the median moving almost imperceptibly up to 15.90 PPM. However, Syniikal still achieved a mind-blowing 25.14 PPM, becoming the first and only player ever to cross the 25+ PPM threshold.
+
+S15 and S16 both saw minuscule increases in the median PPM, again with Syniikal leading the pack in both seasons. S16 saw Syniikal's partner, HERB, become the third member to join the 20+ PPM crew. In S17, the game's creator, known in-game as **LuckySpammer**, removed every extant Tagpro server and replaced them with new ones from a different provider. The new servers were a direct downgrade for many players, and complaints about poor connection, high ping, and server instability plagued the league. Season 17 marked the first season in the modern era in which the median PPM had fallen from the previous season. This didn't slow down BigBird as he managed to accrue a hefty 20.69 PPM. BigBird became the 4th player to join the 20+ PPM club and the only one who managed to do so without being Syniikal or his partner. 
+
+The median PPM continued to nosedive in S18 all the way down to 14.58 PPM, lower than it had been since S11. S19 saw a very slight recovery in the median PPM, but the distribution looks similar to the S18 distribution. Syniikal, playing as TomatoFarmer, once again used his experience to wield the prevent crown, dominating the leaderboard for the seventh straight season.
+
+<br><br>
+
+```{r echo = FALSE, warning = FALSE, message = FALSE}
+#Prevent by defenders
+beeswarm(ppm ~ season, data = MLTP_defense_stats, pch = 16, col = rainbow(10), method = "hex",
+         main = "Prevent Per Minute for Defenders ", xlab = "Season", ylab = "Prevent Per Minute",
+         )
+
+#Plotly inbound
+prevent <- plot_ly(data= MLTP_defense_stats, x = ~season, y = ~ppm, color = ~season, type = "box", boxpoints = 'all',
+             text = ~player) %>%
+  layout(scene = list(xaxis = list(title = 'Season'),
+                      yaxis = list(title = 'Prevent Per Minute')),
+         title = "Prevent Per Minute for Defenders")
+prevent
+```
+
+<br><br>
+
+#### Section B: Tags
+
+<br><br>
+
+Back in S10, most defenders struggled to get tags, with the median being a paltry 1.44 tags per minute (TPM). Even though the median TPM was low, the founders of the 2.0+ TPM club were born:  Abe Lincoln weighing in at 2.11 TPM and the infamous GriefSeeds with an astounding 2.38 TPM. The mechanical skill disparity between GriefSeeds and the rest of the defenders from the Classical Era was immense. GriefSeeds received a lifetime ban from MLTP for botting in S7, which was then overturned due to a lack of definitive evidence by the start of S8. He then continued to put up dominant mechanical performances that seemed to defy human limitations in S8 and S10, after which he unfortunately retired. Despite the community still being split on whether or not cheating was involved, none could deny the performances GriefSeeds shared with us were magnificent. Inducted into the Ball of Fame after his incredible Season 10 performance, he received approval from 100% of the voters.
+
+S11 through S15 saw a stable median TPM, with each falling within the 1.53-1.58 TPM range. When considered in conjunction with the prevent numbers during the same time frame, we can see that the average defender increased PPM numbers while maintaining TPM. S12 saw an anomaly towards the top end of the TPM spectrum, with the 2.0+ TPM club growing to a total of four players: CB13 (2.00), Abe Lincoln (2.04), and Iblis (2.10). 
+
+S16 through S19 saw a lower distribution of tagging prowess, with the median TPM being around 1.4, the top taggers rarely reaching even 1.8 TPM, and no players joining the 2+ TPM club. Considering that prevent numbers were declining across those seasons, the data points to the offenders pushing back against the defensive edge that had been built in the prior seasons.
+
+<br><br>
+
+```{r echo = FALSE, warning = FALSE, message = FALSE}
+#Tags by defenders
+beeswarm(tpm ~ season, data = MLTP_defense_stats, pch = 16, col = rainbow(10), method = "hex",
+         main = "Tags Per Minute for Defenders", xlab = "Season", ylab = "Tags Per Minute",
+         )
+
+#Plotly inbound
+tags <- plot_ly(data= MLTP_defense_stats, x = ~season, y = ~tpm, color = ~season, type = "box", boxpoints = 'all',
+             text = ~player) %>%
+  layout(scene = list(xaxis = list(title = 'Season'),
+                      yaxis = list(title = 'Tags Per Minute')),
+         title = "Tags Per Minute for Defenders")
+tags
+```
+
+<br><br>
+
+#### Section C: Kill/Death Ratio
+
+<br><br>
+
+S10 saw three players cross the 3+ K/D ratio barrier: GriefSeeds (3.07), Abe Lincoln (3.67), and Syniikal (5.82). Syniikal crossed the 3+ K/D threshold every single season; no other player managed to do so after S10, which kept the club at an exclusive three players. The median K/D ratio stayed consistent from S10 through S15, before starting to decrease monotonically in S16 through S18, and then increased slightly again in S19. While the historical data makes it seem unlikely another player will join the 3+ club, perhaps another player with enough discipline will arise one day.
+
+<br><br>
+
+```{r echo = FALSE, warning = FALSE, message = FALSE}
+#KDR by defenders
+beeswarm(kdr ~ season, data = MLTP_defense_stats, pch = 16, col = rainbow(10), method = "hex",
+         main = "Kill/Death Ratio for Defenders", xlab = "Season", ylab = "Kill/Death Ratio",
+         )
+
+#Plotly inbound
+kdr <- plot_ly(data= MLTP_defense_stats, x = ~season, y = ~kdr, color = ~season, type = "box", boxpoints = 'all',
+                text = ~player) %>%
+  layout(scene = list(xaxis = list(title = 'Season'),
+                      yaxis = list(title = 'Kill/Death Ratio')),
+         title = "Kill/Death Ratio for Defenders")
+kdr
+```
+
+<br><br>
+
+#### Section D: Hold
+
+<br><br>
+
+Season 10 & 11 were the holding man's dreamscape. The median hold per minute (HPM) was around 11.5 HPM in both seasons, which even top holders struggled to achieve in the later seasons. In the last eight seasons combined, only one player (gg!) managed to get at least 14 HPM, yet three players in S10 and five players in S11 exceeded that threshhold. 
+
+Starting in S12, with the advent of the prevent era (Preventaissance), the median HPM and the top HPM both started shifting drastically lower. By S15, the hold leader, badger (11.24 HPM), was unable to reach the hold numbers that the median offenders could in Season 10 or Season 11. Median HPM continued to decrease in subsequent seasons, although several players did manage to beat the S11 median HPM: WarriOrs (x3), bright (x2), DEAD NAN, okthenXD, gg!, and Messi. Even though PPM started to fall in S17 and S18, HPM continued to drop to an all-time low in S18. Despite hold leader gg! finding a way to put up a dominant 14.02 HPM, the median HPM was only a paltry 8.48 HPM. 
+
+<br><br>
+
+```{r echo = FALSE, warning = FALSE, message = FALSE}
+#Hold by attackers
+
+beeswarm(hpm ~ season, data = MLTP_offense_stats, pch = 16, col = rainbow(10), method = "hex",
+         main = "Hold Per Minute for Offenders", xlab = "Season", ylab = "Hold Per Minute",
+         )
+
+#Plotly inbound
+hold <- plot_ly(data= MLTP_offense_stats, x = ~season, y = ~hpm, color = ~season, type = "box", boxpoints = 'all',
+             text = ~player) %>%
+  layout(scene = list(xaxis = list(title = 'Season'),
+                      yaxis = list(title = 'Hold Per Minute')),
+         title = "Hold Per Minute for Offenders")
+hold
+```
+
+<br><br>
+
+#### Section E: Captures
+
+<br><br>
+
+Despite hold being high and prevent being low in Season 10, offenders were not able to score very many captures. The median captures per minute (CPM) was a scant 0.115 CPM, the worst of any modern season. With low median values for TPM and PPM in Season 10, defenders struggled to keep the flag in the base and get the flag reset. With both flags frequently being held simultaneously, neither flag carrier had opportunities to capture.  
+
+In Season 11, there was a noticeable jump, with the median shooting up to 0.135 CPM. Hold stayed approximately the same as the previous season, while tags and prevent both increased. The increased prevent indicates that the defenders protected the flag more than the previous season. A large part of this phenomenon was the ever-increasing popularity of anti-re. Offenders were given more opportunities to capture while the defenders were blocking the other team out.
+
+Season 12 was possibly the most statistically enjoyable season for both offenders and defenders alike. While S12 had only the 6th highest median PPM, it was also first in both median TPM & median CPM and third in median HPM. Offenders were getting a decent amount of hold while getting a lot of caps. Defenders were getting lots of tags and keeping the flag in base enough for offenders to capture frequently. Offenders got rewarded for good grabs and hold, while defenders got rewarded for keeping the flag safe and getting resets by playing effective anti-re. I personally believe this lends some analytical evidence to the reason why many veteran players look back so fondly on Season 12.
+
+From Season 13 through Season 19, the median CPM was relatively stable, fluctuating around a baseline value of 0.13-0.14, except Season 17 (the server debacle season). The hold numbers continuing to drop is probably the main reason that the median CPM will never be as high as it used to be. Offenders will simply not have as much time to run in circles with the flag. Instead, offenders are relying upon quick, dynamic paths with the flag to notch a crisp capture before the defenders can catch up.
+
+The 15+ HPM club remains empty to this day, with toasty's Season 11 performance of 14.88 HPM being the closest any player has ever come. The 14+ HPM region contains eight players: MILKY (x2), toasty, Mr. Hat, Hulzy, BAN NAN (DEAD NAN), Stojakovic, gg!, and LEBRON*JAMES.
+
+<br><br>
+
+```{r echo = FALSE, warning = FALSE, message = FALSE}
+#Caps for attackers
+beeswarm(cpm ~ season, data = MLTP_offense_stats, pch = 16, col = rainbow(10), method = "hex",
+         main = "Captures Per Minute for Offenders", xlab = "Season", ylab = "Captures Per Minute",
+         )
+
+caps <- plot_ly(data= MLTP_offense_stats, x = ~season, y = ~cpm, color = ~season, type = "box", boxpoints = 'all',
+                text = ~player) %>%
+  layout(scene = list(xaxis = list(title = 'Season'),
+                      yaxis = list(title = 'Captures Per Minute')),
+         title = "Captures Per Minute by MLTP Offenders")
+caps
+```
+
+<br><br>
+
+#### Section F: Grabs
+
+<br><br>
+
+The median grabs per minute (GPM) was relatively low in S10, sitting at only 1.47 GPM. In Season 11, the median GPM jumped to 1.65 GPM.  Median GPM stayed roughly the same over the next two seasons, before starting to fall starting in Season 14, culminating with the median GPM in S19 approximately equivalent to the median GPM in S10, bringing us full circle after ten seasons. The only player to join the 2.0+ GPM club was protag with 2.03 GPM in Season 14. An honorable mention goes to MILKY for his Season 12 performance with 1.9964 GPM, just barely missing the cutoff to join the elite club. 
+
+<br><br>
+
+```{r echo = FALSE, warning = FALSE, message = FALSE}
+#Grabs for attackers
+beeswarm(gpm ~ season, data = MLTP_offense_stats, pch = 16, col = rainbow(10), method = "hex",
+         main = "Grabs Per Minute for Offenders", xlab = "Season", ylab = "Grabs Per Minute",
+         )
+
+grabs <- plot_ly(data= MLTP_offense_stats, x = ~season, y = ~gpm, color = ~season, type = "box", boxpoints = 'all',
+                text = ~player) %>%
+  layout(scene = list(xaxis = list(title = 'Season'),
+                      yaxis = list(title = 'Grabs Per Minute')),
+         title = "Grabs Per Minute for Offenders")
+grabs
+```
+
+<br><br>
+
+#### Section G: Scoring Percentage
+
+<br><br>
+
+The median scoring percentage in Season 10 was a pitiful 6.4%. In the ensuing seasons, the median scoring percentage trended upward, climbing to a peak in Season 16 at a respectable 9.08% and settling at 8.76% in Season 19. The elite club of players with a scoring percentage of at least 15% consists of only four members: Syniikal (x4), WarriOrs (x2), bright, and Ty. Syniikal also managed to put up a scoring percentage of 0% in three separate seasons, which no other player has committed the iniquity of achieving even once.
+
+<br><br>
+
+```{r echo = FALSE, warning = FALSE, message = FALSE}
+beeswarm(cap_per ~ season, data = MLTP_filtered_stats, pch = 16, col = rainbow(10), method = "hex",
+         main = "Scoring Percentage for All Players", xlab = "Season", ylab = "Scoring Percentage",
+         )
+
+cap_percent <- plot_ly(data= MLTP_filtered_stats, x = ~season, y = ~cap_per, color = ~season, type = "box", boxpoints = 'all',
+                text = ~player) %>%
+  layout(scene = list(xaxis = list(title = 'Season'),
+                      yaxis = list(title = 'Scoring Percentage')),
+         title = "Scoring Percentage for All Players")
+cap_percent
+```
+
+<br><br>
+
+#### Section H: Capture Differential
+
+<br><br>
+
+Theoretically, the capture differential per minute should be centered around zero since Tagpro is a zero-sum game. However, only players with at least 120 minutes played in the season are included in the dataset. Now the median capture differential per minute (CDPM) actually provides information on the performance of the substitute players who were just filling in for majors starters. The higher a season's median CDPM, the worse the filler players performed. Two of the weakest sets of players compared to the substitutes were Season 11 and Season 14 with -0.046 CDPM and -0.055 CDPM, respectively. The strongest group of starters occurred in the crowd favorite Season 12, with a +0.032 CDPM. Only five players ever managed to enter the 0.30+ CDPM clan: caramelbaays (0.363), Apopalypse (0.318), DOKE(0.306), Epiphany (0.303), and toasty (0.300).
+
+<br><br>
+
+```{r echo = FALSE, warning = FALSE, message = FALSE}
+beeswarm(success_rate ~ season, data = MLTP_filtered_stats, pch = 16, col = rainbow(10), method = "hex",
+         main = "Capture Differential Per Minute for All Players", xlab = "Season", ylab = "Capture Differential Per Minute",
+         )
+
+cap_diff <- plot_ly(data= MLTP_filtered_stats, x = ~season, y = ~success_rate, color = ~season, type = "box", boxpoints = 'all',
+                text = ~player) %>%
+  layout(scene = list(xaxis = list(title = 'Season'),
+                      yaxis = list(title = 'Capture Differential Per Minute')),
+         title = "Capture Differential Per Minute for All Players")
+cap_diff
+```
+
+<br><br>
+
+### Part IV: Miscellaneous Lesser Categories
+
+<br><br>
+
+I have created beeswarms and boxplots for some of the stat categories that are rarely talked about in competitive play, but may still be of interest. Unlike the previous sections, I have merely displayed the distributions for perusal and eschewed any explanations.
+
+<br><br>
+
+```{r echo = FALSE, warning = FALSE, message = FALSE}
+beeswarm(scpm ~ season, data = MLTP_filtered_stats, pch = 16, col = rainbow(10), method = "hex",
+         main = "Score Per Minute for All Players", xlab = "Season", ylab = "Score Per Minute",
+         )
+
+score <- plot_ly(data= MLTP_filtered_stats, x = ~season, y = ~scpm, color = ~season, type = "box", boxpoints = 'all',
+                text = ~player) %>%
+  layout(scene = list(xaxis = list(title = 'Season'),
+                      yaxis = list(title = 'Score Per Minute')),
+         title = "Score Per Minute for All Players")
+score
+```
+
+<br><br>
+
+```{r echo = FALSE, warning = FALSE, message = FALSE}
+beeswarm(pupm ~ season, data = MLTP_filtered_stats, pch = 16, col = rainbow(10), method = "hex",
+         main = "Powerups Per Minute for All Players", xlab = "Season", ylab = "Powerups Per Minute",
+         )
+
+powerups <- plot_ly(data= MLTP_filtered_stats, x = ~season, y = ~pupm, color = ~season, type = "box", boxpoints = 'all',
+                text = ~player) %>%
+  layout(scene = list(xaxis = list(title = 'Season'),
+                      yaxis = list(title = 'Powerups Per Minute')),
+         title = "Powerups Per Minute for All Players")
+powerups
+```
+
+<br><br>
+
+```{r echo = FALSE, warning = FALSE, message = FALSE}
+beeswarm(poppm ~ season, data = MLTP_defense_stats, pch = 16, col = rainbow(10), method = "hex",
+         main = "Pops Per Minute for Defenders", xlab = "Season", ylab = "Pops Per Minute",
+         )
+
+dpops <- plot_ly(data= MLTP_defense_stats, x = ~season, y = ~poppm, color = ~season, type = "box", boxpoints = 'all',
+                text = ~player) %>%
+  layout(scene = list(xaxis = list(title = 'Season'),
+                      yaxis = list(title = 'Pops Per Minute')),
+         title = "Pops Per Minute for Defenders")
+dpops
+```
+
+<br><br>
+
+```{r echo = FALSE, warning = FALSE, message = FALSE}
+beeswarm(droppm ~ season, data = MLTP_offense_stats, pch = 16, col = rainbow(10), method = "hex",
+         main = "Drops Per Minute for Offenders", xlab = "Season", ylab = "Drops Per Minute",
+         )
+
+odrops <- plot_ly(data= MLTP_offense_stats, x = ~season, y = ~droppm, color = ~season, type = "box", boxpoints = 'all',
+                text = ~player) %>%
+  layout(scene = list(xaxis = list(title = 'Season'),
+                      yaxis = list(title = 'Drops Per Minute')),
+         title = "Drops Per Minute for Offenders")
+odrops
+```
+
+<br><br>
+
+## IDE Information
+
+<br><br>
+
+```{r echo = FALSE}
+sessionInfo()
+```
